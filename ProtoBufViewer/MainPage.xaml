@@ -5,6 +5,15 @@
              xmlns:froto ="clr-namespace:Froto.Parser;assembly=Froto.Parser"
              x:DataType="local:MainPageViewModel"
              x:Class="ProtoBufViewer.MainPage">
+    <ContentPage.Resources>
+        <DataTemplate x:Key="MessageViewModel" x:DataType="local:MessageViewModel">
+            <ViewCell>
+                <VerticalStackLayout>
+                    <Label Text="{Binding Path=Name}"/>
+                </VerticalStackLayout>
+            </ViewCell>
+        </DataTemplate>
+    </ContentPage.Resources>
     <ContentPage.BindingContext>
         <local:MainPageViewModel />
     </ContentPage.BindingContext>
@@ -14,7 +23,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-                
+
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -35,12 +44,8 @@
             <ListView 
                 Grid.Row="1"
                 SelectedItem="{Binding Path=SelectedMessage}"
-                ItemsSource="{Binding Path=Messages}">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="froto:Ast+PStatement+TMessage">
-                        <TextCell Text="{Binding Path=Item1}"/>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
+                ItemsSource="{Binding Path=Messages}"
+                ItemTemplate="{StaticResource MessageViewModel}">
             </ListView>
         </Grid>
     </ScrollView>

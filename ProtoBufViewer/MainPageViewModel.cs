@@ -1,4 +1,7 @@
-﻿using Froto.Parser;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
+using Froto.Parser;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Microsoft.FSharp.Collections;
@@ -7,13 +10,14 @@ using System.ComponentModel;
 using System.Dynamic;
 using System.Runtime.CompilerServices;
 using static Google.Protobuf.WireFormat;
+using static Protobuf3Parser;
 
 namespace ProtoBufViewer
 {
     internal class MainPageViewModel : INotifyPropertyChanged
     {
-        private FSharpList<Ast.PStatement>? parseResult;
-        private Ast.PStatement.TMessage? selectedMessage;
+        private ProtoContext? parseResult;
+        private MessageViewModel? selectedMessage;
 
         public MainPageViewModel()
         {
@@ -26,10 +30,10 @@ namespace ProtoBufViewer
         public Command OpenProtoCommand { get; }
         public Command OpenBinaryCommand { get; }
 
-        public ObservableCollection<Ast.PStatement.TMessage> Messages { get; } = new();
-        public Ast.PStatement.TMessage? SelectedMessage { get => selectedMessage; set { selectedMessage = value; OnPropertyChanged(); OpenBinaryCommand.ChangeCanExecute(); } }
+        public ObservableCollection<MessageViewModel> Messages { get; } = new();
+        public MessageViewModel? SelectedMessage { get => selectedMessage; set { selectedMessage = value; OnPropertyChanged(); OpenBinaryCommand.ChangeCanExecute(); } }
 
-        protected FSharpList<Ast.PStatement>? ParseResult { get => parseResult; set { parseResult = value; OnPropertyChanged(); } }
+        protected ProtoContext? ParseResult { get => parseResult; set { parseResult = value; OnPropertyChanged(); } }
 
         private async void OpenProto(object o)
         {
@@ -40,16 +44,27 @@ namespace ProtoBufViewer
                     { DevicePlatform.WinUI, new[] { "proto" } }
                 })
             });
-            if (pick is not null)
+            if (pick is { FullPath: { } path})
             {
-                var pStatements = Parse.fromFile(pick.FullPath);
-                var messages = pStatements.Where(s => s.IsTMessage).Cast<Ast.PStatement.TMessage>().ToList();
+                var proto = ParseFile(path);
+                ParseResult = proto;
+                var walker = new ParseTreeWalker();
+                var listener = new MessageViewModel.Listener();
+                walker.Walk(listener, proto);
                 Messages.Clear();
-                foreach (var message in messages)
+                foreach (var m in listener.Messages)
                 {
-                    Messages.Add(message);
+                    Messages.Add(m);
                 }
             }
+        }
+
+        private static ProtoContext ParseFile(string fileName)
+        {
+            var tokenStream = new BufferedTokenStream(new Protobuf3Lexer(CharStreams.fromPath(fileName)));
+            var parser = new Protobuf3Parser(tokenStream);
+            var proto = parser.proto();
+            return proto;
         }
 
         private async void OpenOpenBinary(object o)
