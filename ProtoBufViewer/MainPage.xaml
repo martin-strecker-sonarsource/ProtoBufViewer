@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:ProtoBufViewer"
+             xmlns:froto ="clr-namespace:Froto.Parser;assembly=Froto.Parser"
+             x:DataType="local:MainPageViewModel"
+             x:Class="ProtoBufViewer.MainPage">
+    <ContentPage.BindingContext>
+        <local:MainPageViewModel />
+    </ContentPage.BindingContext>
+    <ScrollView>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+                
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="0"
+                    x:Name="bt_OpenProto"
+                    Text="Open Proto file" 
+                    Command="{Binding Path=OpenProtoCommand}" />
+                <Button
+                    Grid.Column="1"
+                    x:Name="bt_OpenBinary"
+                    Text="Open encoded proto" 
+                    Command="{Binding Path=OpenBinaryCommand}" />
+            </Grid>
+            <ListView 
+                Grid.Row="1"
+                SelectedItem="{Binding Path=SelectedMessage}"
+                ItemsSource="{Binding Path=Messages}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="froto:Ast+PStatement+TMessage">
+                        <TextCell Text="{Binding Path=Item1}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </ScrollView>
+
+</ContentPage>
