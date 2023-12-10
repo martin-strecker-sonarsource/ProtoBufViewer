@@ -2,11 +2,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:ProtoBufViewer"
-             xmlns:froto ="clr-namespace:Froto.Parser;assembly=Froto.Parser"
+             xmlns:logic="clr-namespace:ProtoBuf.Logic;assembly=ProtoBuf.Logic"
              x:DataType="local:MainPageViewModel"
              x:Class="ProtoBufViewer.MainPage">
     <ContentPage.Resources>
-        <DataTemplate x:Key="MessageViewModel" x:DataType="local:MessageViewModel">
+        <DataTemplate x:Key="MessageViewModel" x:DataType="logic:MessageViewModel">
             <ViewCell>
                 <VerticalStackLayout>
                     <Label Text="{Binding Path=Name}"/>

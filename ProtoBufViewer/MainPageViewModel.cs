@@ -1,10 +1,9 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Froto.Parser;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
-using Microsoft.FSharp.Collections;
+using ProtoBuf.Logic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Dynamic;
@@ -46,7 +45,7 @@ namespace ProtoBufViewer
             });
             if (pick is { FullPath: { } path})
             {
-                var proto = ParseFile(path);
+                var proto = ProtoParser.ParseFile(path);
                 ParseResult = proto;
                 var walker = new ParseTreeWalker();
                 var listener = new MessageViewModel.Listener();
@@ -57,14 +56,6 @@ namespace ProtoBufViewer
                     Messages.Add(m);
                 }
             }
-        }
-
-        private static ProtoContext ParseFile(string fileName)
-        {
-            var tokenStream = new BufferedTokenStream(new Protobuf3Lexer(CharStreams.fromPath(fileName)));
-            var parser = new Protobuf3Parser(tokenStream);
-            var proto = parser.proto();
-            return proto;
         }
 
         private async void OpenOpenBinary(object o)
