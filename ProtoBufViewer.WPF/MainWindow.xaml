@@ -11,8 +11,6 @@
         <local:MainWindowViewModel />
     </Window.DataContext>
     <Window.Resources>
-        <local:ProtBufTypeTemplateSelector x:Key="ProtBufTypeTemplateSelector" />
-
         <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedField}" ItemsSource="{Binding Path=Value.Fields}">
             <StackPanel Orientation="Horizontal">
                 <!--<TextBlock Text="TypedField: " />-->
@@ -43,6 +41,9 @@
 
         <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedMessage}" ItemsSource="{Binding Fields}">
             <StackPanel Orientation="Horizontal">
+                <StackPanel.ToolTip>
+                    <TextBlock Text="{Binding Definition}" />
+                </StackPanel.ToolTip>
                 <!--<TextBlock Text="TypedMessage: " />-->
                 <TextBlock Text="{Binding MessageType}" />
             </StackPanel>

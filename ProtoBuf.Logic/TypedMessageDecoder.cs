@@ -24,6 +24,16 @@ namespace ProtoBuf.Logic
     public sealed record class TypedMessage(IReadOnlyList<TypedField> Fields, MessageDefContext? MessageDef) : ProtoType("Message")
     {
         public string MessageType => MessageDef == null ? "Unknown message type" : MessageDef.messageName().GetText();
+
+        public string Definition => GetFullText(MessageDef);
+
+        public static string GetFullText(MessageDefContext context)
+        {
+            if (context.Start == null || context.Stop == null || context.Start.StartIndex < 0 || context.Stop.StopIndex < 0)
+                return context.GetText(); // Fallback
+
+            return context.Start.InputStream.GetText(Interval.Of(context.Start.StartIndex, context.Stop.StopIndex));
+        }
     }
     public sealed record class TypedEnum(int Value, EnumDefContext? EnumDef) : ProtoType("Enum")
     {
