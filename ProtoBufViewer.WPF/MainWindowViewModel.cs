@@ -31,6 +31,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     protected ProtoContext? ParseResult { get => parseResult; set { parseResult = value; OnPropertyChanged(); } }
 
+
+    private ObservableCollection<TypedMessage> typedMessages;
+    public ObservableCollection<TypedMessage> TypedMessages { get => typedMessages; set { typedMessages = value; OnPropertyChanged(); } }
+
     private async Task OpenProto()
     {
         OpenFileDialog openFileDialog = new();
@@ -62,7 +66,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             using var file = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
             using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
             var decoder = new TypedMessageDecoder();
-            var parseResult = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
+            TypedMessages = new ObservableCollection<TypedMessage>(decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext));
         }
     }
 

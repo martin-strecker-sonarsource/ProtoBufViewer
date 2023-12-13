@@ -4,23 +4,37 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProtoBufViewer.WPF"
+        xmlns:protobufLogic="clr-namespace:ProtoBuf.Logic;assembly=ProtoBuf.Logic"
         mc:Ignorable="d"
         Title="ProtoBuf Viewer" Height="450" Width="800">
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
     <Window.Resources>
-        <DataTemplate x:Key="MessageViewModel">
-            <Border>
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="{Binding Path=Name}">
-                        <TextBlock.ToolTip>
-                            <TextBlock Text="{Binding Path=Definition}" />
-                        </TextBlock.ToolTip>
-                    </TextBlock>
-                </StackPanel>
-            </Border>
+        <local:ProtBufTypeTemplateSelector x:Key="ProtBufTypeTemplateSelector" />
+
+        <DataTemplate x:Key="TypeFieldTemplate" DataType="{x:Type protobufLogic:TypedField}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="TypedField: " />
+                <TextBlock Text="{Binding Name}" />
+                <TextBlock Text=": " />
+                <ContentPresenter Content="{Binding Value}" ContentTemplateSelector="{StaticResource ProtBufTypeTemplateSelector}" />
+            </StackPanel>
         </DataTemplate>
+
+        <DataTemplate x:Key="ProtoTypeTemplate" DataType="{x:Type protobufLogic:ProtoType}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="ProtoTypeValue: " />
+                <TextBlock Text="{Binding Value}" />
+            </StackPanel>
+        </DataTemplate>
+
+        <HierarchicalDataTemplate x:Key="TypedMessageTemplate" DataType="{x:Type protobufLogic:TypedMessage}" ItemsSource="{Binding Fields}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="TypedMessage: " />
+                <TextBlock Text="{Binding MessageType}" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
     </Window.Resources>
     <ScrollViewer>
         <Grid>
@@ -46,12 +60,28 @@
                     Content="Open encoded proto"
                     Command="{Binding Path=OpenBinaryCommand}" />
             </Grid>
-            <ListView
-                Grid.Row="1"
-                SelectedItem="{Binding Path=SelectedMessage}"
-                ItemsSource="{Binding Path=Messages}"
-                ItemTemplate="{StaticResource MessageViewModel}">
-            </ListView>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ListView
+                    Grid.Column="0"
+                    SelectedItem="{Binding Path=SelectedMessage}"
+                    ItemsSource="{Binding Path=Messages}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding Definition}" />
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <TreeView Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" ItemTemplateSelector="{StaticResource ProtBufTypeTemplateSelector}" />
+            </Grid>
         </Grid>
     </ScrollViewer>
 </Window>
