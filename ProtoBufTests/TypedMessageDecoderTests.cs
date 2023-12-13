@@ -176,7 +176,54 @@ namespace ProtoBufTests
         public void TypedMessageDecoder_Log()
         {
             IReadOnlyList<TypedMessage> actual = ParseBinary("log.pb", "LogInfo");
-            actual.Should().BeEquivalentTo(new string[] { });
+            actual.Should().BeEquivalentTo(new[]
+            {
+                new
+                {
+                    MessageType = "LogInfo",
+                    Fields = new[]
+                    { 
+                        new { Value = new { Value =  (object)2 } },
+                        new { Value = new { Value =  (object)"Roslyn version: 4.8.0.0" } },
+                    },
+                },
+                new
+                {
+                    MessageType = "LogInfo",
+                    Fields = new[]
+                    {
+                        new { Value = new { Value =  (object)2 } },
+                        new { Value = new { Value =  (object)"Language version: CSharp11" } },
+                    },
+                },
+                new
+                {
+                    MessageType = "LogInfo",
+                    Fields = new[]
+                    {
+                        new { Value = new { Value =  (object)2 } },
+                        new { Value = new { Value =  (object)"Concurrent execution: enabled" } },
+                    },
+                },
+                new
+                {
+                    MessageType = "LogInfo",
+                    Fields = new[]
+                    {
+                        new { Value = new { Value =  (object)1 } },
+                        new { Value = new { Value =  (object)@"File 'C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\obj\Debug\netstandard2.0\.NETStandard,Version=v2.0.AssemblyAttributes.cs' was recognized as generated" } },
+                    },
+                },
+                new
+                {
+                    MessageType = "LogInfo",
+                    Fields = new[]
+                    {
+                        new { Value = new { Value =  (object)1 } },
+                        new { Value = new { Value =  (object)@"File 'C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\obj\Debug\netstandard2.0\AssemblyB.AssemblyInfo.cs' was recognized as generated" } },
+                    },
+                },
+            });
         }
 
         private static IReadOnlyList<TypedMessage> ParseBinary(string pbFile, string protoDefinition)
