@@ -19,6 +19,7 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+namespace ProtoBuf.Antlr {
 using System;
 using System.IO;
 using System.Text;
@@ -175,6 +176,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitProto(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitProto(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -272,6 +279,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitSyntax(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitSyntax(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -332,6 +345,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitImportStatement(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitImportStatement(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -400,6 +419,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitPackageStatement(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitPackageStatement(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -452,6 +477,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitOptionStatement(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOptionStatement(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -509,6 +540,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitOptionName(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOptionName(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -620,6 +657,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitFieldLabel(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFieldLabel(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -686,6 +729,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitField(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitField(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -770,6 +819,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitFieldOptions(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFieldOptions(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -834,6 +889,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitFieldOption(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFieldOption(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -880,6 +941,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitFieldNumber(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFieldNumber(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -944,6 +1011,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitOneof(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOneof(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1040,6 +1113,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitOneofField(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOneofField(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -1126,6 +1205,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitMapField(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMapField(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -1211,6 +1296,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitKeyType(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitKeyType(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -1279,6 +1370,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitType_(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitType_(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1446,6 +1543,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitReserved(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitReserved(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -1518,6 +1621,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitRanges(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRanges(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -1582,6 +1691,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitRange_(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRange_(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1662,6 +1777,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitReservedFieldNames(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitReservedFieldNames(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -1730,6 +1851,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitTopLevelDef(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitTopLevelDef(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1807,6 +1934,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumDef(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumDef(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -1858,6 +1991,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumBody(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumBody(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1924,6 +2063,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumElement(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumElement(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1996,6 +2141,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumField(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumField(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2076,6 +2227,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumValueOptions(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumValueOptions(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -2144,6 +2301,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumValueOption(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumValueOption(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -2194,6 +2357,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitMessageDef(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMessageDef(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2246,6 +2415,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitMessageBody(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMessageBody(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2330,6 +2505,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitMessageElement(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMessageElement(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2450,6 +2631,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitExtendDef(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitExtendDef(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2575,6 +2762,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitServiceDef(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitServiceDef(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -2644,6 +2837,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitServiceElement(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitServiceElement(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2744,6 +2943,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitRpc(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRpc(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2890,6 +3095,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitConstant(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitConstant(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3024,6 +3235,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitBlockLit(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitBlockLit(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3086,6 +3303,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEmptyStatement_(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEmptyStatement_(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3129,6 +3352,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitIdent(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitIdent(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -3230,6 +3459,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitFullIdent(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFullIdent(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3290,6 +3525,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitMessageName(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMessageName(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3332,6 +3573,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumName(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumName(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -3376,6 +3623,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitFieldName(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFieldName(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3418,6 +3671,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitOneofName(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOneofName(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -3462,6 +3721,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitMapName(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMapName(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3505,6 +3770,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitServiceName(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitServiceName(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3547,6 +3818,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitRpcName(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRpcName(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -3600,6 +3877,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitMessageType(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMessageType(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -3684,6 +3967,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitEnumType(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEnumType(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3755,6 +4044,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitIntLit(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitIntLit(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3797,6 +4092,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitStrLit(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitStrLit(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -3847,6 +4148,12 @@ public partial class Protobuf3Parser : Parser {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitBoolLit(this);
 		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitBoolLit(this);
+			else return visitor.VisitChildren(this);
+		}
 	}
 
 	[RuleVersion(0)]
@@ -3887,6 +4194,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitFloatLit(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFloatLit(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -3963,6 +4276,12 @@ public partial class Protobuf3Parser : Parser {
 		public override void ExitRule(IParseTreeListener listener) {
 			IProtobuf3Listener typedListener = listener as IProtobuf3Listener;
 			if (typedListener != null) typedListener.ExitKeywords(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IProtobuf3Visitor<TResult> typedVisitor = visitor as IProtobuf3Visitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitKeywords(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -4168,3 +4487,4 @@ public partial class Protobuf3Parser : Parser {
 
 
 }
+} // namespace ProtoBuf.Antlr

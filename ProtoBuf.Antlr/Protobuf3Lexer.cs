@@ -19,6 +19,7 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+namespace ProtoBuf.Antlr {
 using System;
 using System.IO;
 using System.Text;
@@ -324,3 +325,4 @@ public partial class Protobuf3Lexer : Lexer {
 
 
 }
+} // namespace ProtoBuf.Antlr

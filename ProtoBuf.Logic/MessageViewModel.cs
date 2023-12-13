@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using ProtoBuf.Antlr;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ProtoBuf.Logic
 {
