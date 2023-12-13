@@ -151,9 +151,11 @@ namespace ProtoBuf.Logic
         {
             bool rootSearch = names.FirstOrDefault() == ".";
             var searchRoot = rootSearch
-                ? protoContext.topLevelDef().Select(x => x.enumDef()).FirstOrDefault(x => x != null)
-                : expectedType.AncestorsAndSelf().OfType<EnumDefContext>().FirstOrDefault();
-            var result = names.Skip(rootSearch ? 1 : 0).Aggregate(searchRoot, (parent, name) => parent?.enumName().GetText() == name ? parent : null);
+                ? protoContext.topLevelDef().Select(x => x.enumDef())
+                : expectedType.AncestorsAndSelf().OfType<EnumDefContext>();
+            searchRoot = searchRoot.Where(x => x != null);
+            var result = names.Skip(rootSearch ? 1 : 0).Aggregate(searchRoot, (parent, name) => [parent.FirstOrDefault(x => x.enumName().GetText() == name)], x=>x?.FirstOrDefault());
+
             if (result == null && !rootSearch)
             {
                 return BindEnumDef(protoContext, new[] { "." }.Concat(names), expectedType);
