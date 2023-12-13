@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBufViewer", "ProtoBufViewer\ProtoBufViewer.csproj", "{EA9F9F00-3D78-4BA3-AB23-631A9730B946}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBuf.Antlr", "ProtoBuf.Antlr\ProtoBuf.Antlr.csproj", "{DC0FA2EB-CD44-4C70-8257-4941F3FDC68C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoBufTests", "ProtoBufTests\ProtoBufTests.csproj", "{7A614906-8C7A-4417-9CD0-7F44818AE649}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBufTests", "ProtoBufTests\ProtoBufTests.csproj", "{7A614906-8C7A-4417-9CD0-7F44818AE649}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoBuf.Logic", "ProtoBuf.Logic\ProtoBuf.Logic.csproj", "{1D8BCAEE-DEC3-4A19-9FBC-A82527EFF3B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBuf.Logic", "ProtoBuf.Logic\ProtoBuf.Logic.csproj", "{1D8BCAEE-DEC3-4A19-9FBC-A82527EFF3B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoBufViewer.WPF", "ProtoBufViewer.WPF\ProtoBufViewer.WPF.csproj", "{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,12 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EA9F9F00-3D78-4BA3-AB23-631A9730B946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA9F9F00-3D78-4BA3-AB23-631A9730B946}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA9F9F00-3D78-4BA3-AB23-631A9730B946}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{EA9F9F00-3D78-4BA3-AB23-631A9730B946}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA9F9F00-3D78-4BA3-AB23-631A9730B946}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA9F9F00-3D78-4BA3-AB23-631A9730B946}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{DC0FA2EB-CD44-4C70-8257-4941F3FDC68C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC0FA2EB-CD44-4C70-8257-4941F3FDC68C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC0FA2EB-CD44-4C70-8257-4941F3FDC68C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,6 +29,10 @@ Global
 		{1D8BCAEE-DEC3-4A19-9FBC-A82527EFF3B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D8BCAEE-DEC3-4A19-9FBC-A82527EFF3B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D8BCAEE-DEC3-4A19-9FBC-A82527EFF3B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
