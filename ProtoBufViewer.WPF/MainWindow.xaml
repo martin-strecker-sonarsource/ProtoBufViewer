@@ -13,23 +13,23 @@
     <Window.Resources>
         <local:ProtBufTypeTemplateSelector x:Key="ProtBufTypeTemplateSelector" />
 
-        <DataTemplate x:Key="TypeFieldTemplate" DataType="{x:Type protobufLogic:TypedField}">
+        <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedField}" ItemsSource="{Binding Path=Value.Fields}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="TypedField: " />
                 <TextBlock Text="{Binding Name}" />
                 <TextBlock Text=": " />
-                <ContentPresenter Content="{Binding Value}" ContentTemplateSelector="{StaticResource ProtBufTypeTemplateSelector}" />
+                <ContentPresenter Content="{Binding Value}" />
             </StackPanel>
-        </DataTemplate>
+        </HierarchicalDataTemplate>
 
-        <DataTemplate x:Key="ProtoTypeTemplate" DataType="{x:Type protobufLogic:ProtoType}">
+        <DataTemplate DataType="{x:Type protobufLogic:ProtoType}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="ProtoTypeValue: " />
                 <TextBlock Text="{Binding Value}" />
             </StackPanel>
         </DataTemplate>
 
-        <HierarchicalDataTemplate x:Key="TypedMessageTemplate" DataType="{x:Type protobufLogic:TypedMessage}" ItemsSource="{Binding Fields}">
+        <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedMessage}" ItemsSource="{Binding Fields}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="TypedMessage: " />
                 <TextBlock Text="{Binding MessageType}" />
@@ -80,7 +80,7 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <TreeView Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" ItemTemplateSelector="{StaticResource ProtBufTypeTemplateSelector}" />
+                <TreeView Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" />
             </Grid>
         </Grid>
     </ScrollViewer>
