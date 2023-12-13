@@ -9,7 +9,7 @@ using System.ComponentModel;
 using System.Dynamic;
 using System.Runtime.CompilerServices;
 using static Google.Protobuf.WireFormat;
-using static Protobuf3Parser;
+using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBufViewer
 {

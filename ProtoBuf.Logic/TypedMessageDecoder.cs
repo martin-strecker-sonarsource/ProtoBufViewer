@@ -1,5 +1,5 @@
 ﻿using Google.Protobuf;
-using static Protobuf3Parser;
+using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBuf.Logic
 {

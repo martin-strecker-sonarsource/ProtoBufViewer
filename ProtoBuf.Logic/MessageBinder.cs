@@ -2,7 +2,7 @@
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using static Google.Protobuf.WireFormat;
-using static Protobuf3Parser;
+using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBuf.Logic
 {
