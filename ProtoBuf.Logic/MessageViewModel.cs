@@ -16,12 +16,11 @@ namespace ProtoBuf.Logic
             MessageViewModel? parent = null;
             readonly List<MessageViewModel> messages = new List<MessageViewModel>();
             public IReadOnlyCollection<MessageViewModel> Messages => messages;
-            public override bool VisitMessageDef([Antlr4.Runtime.Misc.NotNull] Protobuf3Parser.MessageDefContext context)
+            public override bool VisitMessageDef(Protobuf3Parser.MessageDefContext context)
             {
                 var message = new MessageViewModel(context, context.messageName().GetText(), parent);
                 messages.Add(message);
-                var oldParent = parent;
-                parent = message;
+                (var oldParent, parent) = (parent, message);
                 var result = base.VisitMessageDef(context);
                 parent = oldParent;
                 return result;
