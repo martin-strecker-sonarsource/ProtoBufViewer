@@ -1,8 +1,6 @@
 using FluentAssertions;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 using ProtoBuf.Logic;
-using System.Xml.Linq;
 
 namespace ProtoBufTests
 {
@@ -13,6 +11,7 @@ namespace ProtoBufTests
     [DeploymentItem(@"Artefacts\file-metadata.pb")]
     [DeploymentItem(@"Artefacts\log.pb")]
     [DeploymentItem(@"Artefacts\metrics.pb")]
+    [DeploymentItem(@"Artefacts\token-cpd.pb")]
     public class TypedMessageDecoderTests
     {
         [TestMethod]
@@ -239,10 +238,24 @@ namespace ProtoBufTests
             });
             actual[0].Fields.Should().HaveCount(6);
             // Packed integer
-            actual[0].Fields[2].Should().BeEquivalentTo(new { Name = "code_line", Index = 14, Value = new { Value = 1 } } );
-            actual[0].Fields[3].Should().BeEquivalentTo(new { Name = "code_line", Index = 14, Value = new { Value = 3 } } );
+            actual[0].Fields[2].Should().BeEquivalentTo(new { Name = "code_line", Index = 14, Value = new { Value = 1 } });
+            actual[0].Fields[3].Should().BeEquivalentTo(new { Name = "code_line", Index = 14, Value = new { Value = 3 } });
         }
 
+        [TestMethod]
+        public void TypedMessageDecoder_TokenCpd()
+        {
+            IReadOnlyList<TypedMessage> actual = ParseBinary("token-cpd.pb", "CopyPasteTokenInfo");
+            actual.Should().BeEquivalentTo(new[]{
+                new { MessageType = "CopyPasteTokenInfo", },
+                new { MessageType = "CopyPasteTokenInfo", },
+            });
+            actual[0].Fields.Should().HaveCount(9);
+            // Packed integer
+            actual[0].Fields[0].Should().BeEquivalentTo(new { Name = "file_path", Index = 1, Value = new { Value = @"C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\ClassB.cs" } });
+            actual[0].Fields[2].Should().BeEquivalentTo(new { Name = "token_info", Index = 2, Value = new { MessageType = "TokenInfo" } });
+            actual[0].Fields[3].Should().BeEquivalentTo(new { Name = "token_info", Index = 2, Value = new { MessageType = "TokenInfo" } });
+        }
 
         private static IReadOnlyList<TypedMessage> ParseBinary(string pbFile, string protoDefinition)
         {
