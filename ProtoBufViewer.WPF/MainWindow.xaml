@@ -13,7 +13,11 @@
         <DataTemplate x:Key="MessageViewModel">
             <Border>
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Text="{Binding Path=Name}"/>
+                    <TextBlock Text="{Binding Path=Name}">
+                        <TextBlock.ToolTip>
+                            <TextBlock Text="{Binding Path=Definition}" />
+                        </TextBlock.ToolTip>
+                    </TextBlock>
                 </StackPanel>
             </Border>
         </DataTemplate>
