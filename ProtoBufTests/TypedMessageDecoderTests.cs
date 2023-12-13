@@ -10,6 +10,7 @@ namespace ProtoBufTests
     [DeploymentItem(@"Artefacts\symrefs.pb")]
     [DeploymentItem(@"Artefacts\file-metadata.pb")]
     [DeploymentItem(@"Artefacts\log.pb")]
+    [DeploymentItem(@"Artefacts\metrics.pb")]
     public class TypedMessageDecoderTests
     {
         [TestMethod]
@@ -182,7 +183,7 @@ namespace ProtoBufTests
                 {
                     MessageType = "LogInfo",
                     Fields = new[]
-                    { 
+                    {
                         new { Value = new { Value =  (object)2 } },
                         new { Value = new { Value =  (object)"Roslyn version: 4.8.0.0" } },
                     },
@@ -225,6 +226,17 @@ namespace ProtoBufTests
                 },
             });
         }
+
+        [TestMethod]
+        public void TypedMessageDecoder_Metrics()
+        {
+            IReadOnlyList<TypedMessage> actual = ParseBinary("metrics.pb", "MetricsInfo");
+            actual.Should().BeEquivalentTo(new[]{
+                new { MessageType = "MetricsInfo", },
+                new { MessageType = "MetricsInfo", },
+            });
+        }
+
 
         private static IReadOnlyList<TypedMessage> ParseBinary(string pbFile, string protoDefinition)
         {
