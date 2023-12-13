@@ -1,4 +1,5 @@
-﻿using ProtoBuf.Antlr;
+﻿using Antlr4.Runtime.Misc;
+using ProtoBuf.Antlr;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ProtoBuf.Logic
@@ -10,34 +11,26 @@ namespace ProtoBuf.Logic
         public IReadOnlyCollection<MessageViewModel> Nested { get => nested; }
         public IReadOnlyCollection<FieldViewModel> Fields { get => fields; }
 
-        public class Listener : Protobuf3BaseListener
+        public class Visitor : Protobuf3BaseVisitor<bool>
         {
-            readonly List<MessageViewModel> _Messages = [];
-            readonly Stack<MessageViewModel> _Parents = new();
-            public IReadOnlyList<MessageViewModel> Messages { get => _Messages; }
-
-            public override void EnterMessageDef([NotNull] Protobuf3Parser.MessageDefContext context)
+            MessageViewModel? parent = null;
+            readonly List<MessageViewModel> messages = new List<MessageViewModel>();
+            public IReadOnlyCollection<MessageViewModel> Messages => messages;
+            public override bool VisitMessageDef([Antlr4.Runtime.Misc.NotNull] Protobuf3Parser.MessageDefContext context)
             {
-                _Parents.TryPeek(out var parent);
                 var message = new MessageViewModel(context, context.messageName().GetText(), parent);
-                if (parent == null)
-                {
-                    _Messages.Add(message);
-                }
-                else
-                {
-                    parent.nested.Add(message);
-                }
-                _Parents.Push(message);
+                messages.Add(message);
+                var oldParent = parent;
+                parent = message;
+                var result = base.VisitMessageDef(context);
+                parent = oldParent;
+                return result;
             }
 
-            public override void ExitMessageDef([NotNull] Protobuf3Parser.MessageDefContext context) =>
-                _Parents.Pop();
-
-            public override void EnterField([Antlr4.Runtime.Misc.NotNull] Protobuf3Parser.FieldContext context)
+            public override bool VisitField(Protobuf3Parser.FieldContext context)
             {
-                var parent = _Parents.Peek();
-                parent.fields.Add(new FieldViewModel(context, parent, context.fieldName().GetText(), int.Parse(context.fieldNumber().intLit().GetText())));
+                parent!.fields.Add(new FieldViewModel(context, parent, context.fieldName().GetText(), int.Parse(context.fieldNumber().intLit().GetText())));
+                return base.VisitField(context);
             }
         }
     }

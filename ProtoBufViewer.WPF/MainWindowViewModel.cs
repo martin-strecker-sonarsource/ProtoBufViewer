@@ -1,5 +1,4 @@
-﻿using Antlr4.Runtime.Tree;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Microsoft.Win32;
@@ -41,11 +40,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
         {
             var proto = ProtoParser.ParseFile(openFileDialog.FileName);
             ParseResult = proto;
-            var walker = new ParseTreeWalker();
-            var listener = new MessageViewModel.Listener();
-            walker.Walk(listener, proto);
+            var visitor = new MessageViewModel.Visitor();
+            visitor.Visit(proto);
             Messages.Clear();
-            foreach (var m in listener.Messages)
+            foreach (var m in visitor.Messages.Where(x => x.Parent == null))
             {
                 Messages.Add(m);
             }
