@@ -1,5 +1,4 @@
 ﻿using Google.Protobuf;
-using static Google.Protobuf.WireFormat;
 using static Protobuf3Parser;
 
 namespace ProtoBuf.Logic
@@ -21,20 +20,34 @@ namespace ProtoBuf.Logic
     public sealed record class TypedString(string Value) : ProtoType("String");
     public sealed record class TypedBytes(ByteString Value) : ProtoType("Bytes");
     public sealed record class TypedUnknown(object Value) : ProtoType("Unknown");
-    public sealed record class TypedMessage(IDictionary<TypedField, ProtoType> Fields) : ProtoType("Message");
-    public sealed record class TypedEnum(int value, EnumDefContext? EnumDef) : ProtoType("Enum");
+    public sealed record class TypedMessage(IReadOnlyList<TypedField> Fields, MessageDefContext? MessageDef) : ProtoType("Message")
+    {
+        public string MessageType => MessageDef == null ? "Unknown message type" : MessageDef.messageName().GetText();
+    }
+    public sealed record class TypedEnum(int Value, EnumDefContext? EnumDef) : ProtoType("Enum")
+    {
+        public string EnumType => EnumDef == null ? "Unknown enum type" : EnumDef.enumName().GetText();
+        public string EnumValue => EnumDef?.enumBody().enumElement().FirstOrDefault(
+            x => int.Parse(x.enumField().intLit().INT_LIT().Symbol.Text) == Value)?.enumField().ident().GetText() ?? "Unknown";
+    }
+
     public sealed record class TypedField(string Name, int Index, ProtoType Value);
 
     public class TypedMessageDecoder
     {
-        public TypedMessage? Parse(CodedInputStream stream, ProtoContext protoContext, MessageDefContext initialMessage)
+        public IReadOnlyList<TypedMessage> Parse(CodedInputStream stream, ProtoContext protoContext, MessageDefContext initialMessage)
         {
+            var result = new List<TypedMessage>();
             while (!stream.IsAtEnd)
             {
-                var binder = new MessageBinder(protoContext, initialMessage, int.MaxValue);
-                stream.ReadMessage(binder);
+                var binder = new MessageBinder(protoContext, initialMessage);
+                stream.ReadRawMessage(binder);
+                if (binder.Result != null)
+                {
+                    result.Add(binder.Result);
+                }
             }
-            return null;
+            return result;
         }
     }
 }

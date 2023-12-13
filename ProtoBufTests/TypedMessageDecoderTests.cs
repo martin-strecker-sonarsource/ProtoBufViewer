@@ -17,7 +17,7 @@ namespace ProtoBufTests
             using var memory = new MemoryStream(bytes.Skip(0).ToArray());
             using var stream = CodedInputStream.CreateWithLimits(memory, int.MaxValue, int.MaxValue);
             var decoder = new TypedMessageDecoder();
-            decoder.Parse(stream, proto, tokenTypeInfo);
+            var actual = decoder.Parse(stream, proto, tokenTypeInfo);
         }
 
         [TestMethod]
