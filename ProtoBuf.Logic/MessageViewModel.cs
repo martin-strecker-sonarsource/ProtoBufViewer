@@ -1,6 +1,5 @@
-﻿using Antlr4.Runtime.Misc;
-using ProtoBuf.Antlr;
-using System.Diagnostics.CodeAnalysis;
+﻿using ProtoBuf.Antlr;
+using System.Diagnostics;
 
 namespace ProtoBuf.Logic
 {
@@ -13,9 +12,11 @@ namespace ProtoBuf.Logic
 
         public class Visitor : Protobuf3BaseVisitor<bool>
         {
-            MessageViewModel? parent = null;
-            readonly List<MessageViewModel> messages = new List<MessageViewModel>();
+            private MessageViewModel? parent = null;
+            private readonly List<MessageViewModel> messages = new List<MessageViewModel>();
+
             public IReadOnlyCollection<MessageViewModel> Messages => messages;
+
             public override bool VisitMessageDef(Protobuf3Parser.MessageDefContext context)
             {
                 var message = new MessageViewModel(context, context.messageName().GetText(), parent);
@@ -28,11 +29,14 @@ namespace ProtoBuf.Logic
 
             public override bool VisitField(Protobuf3Parser.FieldContext context)
             {
-                parent!.fields.Add(new FieldViewModel(context, parent, context.fieldName().GetText(), int.Parse(context.fieldNumber().intLit().GetText())));
+                string name = context.fieldName().GetText();
+                int index = int.Parse(context.fieldNumber().intLit().GetText());
+                Debug.Assert(parent != null);
+                parent.fields.Add(new FieldViewModel(context, parent, name, index));
                 return base.VisitField(context);
             }
         }
     }
-    
+
     public record class FieldViewModel(Protobuf3Parser.FieldContext FieldContext, MessageViewModel Message, string Name, int Index);
 }
