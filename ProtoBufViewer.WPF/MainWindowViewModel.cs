@@ -38,11 +38,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
         openFileDialog.Filter = "ProtoBuf Files (*.proto)|*.proto";
         if (openFileDialog.ShowDialog() is true)
         {
-            var proto = ProtoParser.ParseFile(openFileDialog.FileName);
-            ParseResult = proto;
+            ParseResult = (ProtoContext?)ProtoParser.ParseFile(openFileDialog.FileName);
             var visitor = new MessageViewModel.Visitor();
-            visitor.Visit(proto);
             Messages.Clear();
+            visitor.Visit(ParseResult);
             foreach (var m in visitor.Messages.Where(x => x.Parent == null))
             {
                 Messages.Add(m);
