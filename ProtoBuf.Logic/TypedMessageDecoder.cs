@@ -3,7 +3,7 @@ using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBuf.Logic
 {
-    public abstract record class ProtoType(string type);
+    public abstract record class ProtoType(string Type);
     public sealed record class TypedDouble(double Value) : ProtoType("Double");
     public sealed record class TypedFloat(float Value) : ProtoType("Float");
     public sealed record class TypedInt32(Int32 Value) : ProtoType("Int32");
