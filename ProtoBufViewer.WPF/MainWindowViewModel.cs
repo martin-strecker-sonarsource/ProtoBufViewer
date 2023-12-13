@@ -6,6 +6,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Threading;
 using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBufViewer.WPF;
@@ -19,12 +21,15 @@ public class MainWindowViewModel : INotifyPropertyChanged
     {
         OpenProtoCommand = new AsyncRelayCommand(OpenProto);
         OpenBinaryCommand = new AsyncRelayCommand(OpenOpenBinary, () => SelectedMessage != null);
-        ProtoFile = Settings.Default.ProtoFile;
-        SelectedMessage = Messages.FirstOrDefault(x => x.Name == Settings.Default.SelectedMessage);
-        if (SelectedMessage != null)
+        Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
         {
-            ProtoBinFile = Settings.Default.ProtoBinFile;
-        }
+            ProtoFile = Settings.Default.ProtoFile;
+            SelectedMessage = Messages.FirstOrDefault(x => x.Name == Settings.Default.SelectedMessage);
+            if (SelectedMessage != null)
+            {
+                ProtoBinFile = Settings.Default.ProtoBinFile;
+            }
+        }));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -86,16 +91,23 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private void ParseProto()
     {
-        Messages.Clear();
-        if (ProtoFile is { } file && File.Exists(file))
+        try
         {
-            ParseResult = ProtoParser.ParseFile(ProtoFile);
-            var visitor = new MessageViewModel.Visitor();
-            visitor.Visit(ParseResult);
-            foreach (var m in visitor.Messages.Where(x => x.Parent == null))
+            Messages.Clear();
+            if (ProtoFile is { } file && File.Exists(file))
             {
-                Messages.Add(m);
+                ParseResult = ProtoParser.ParseFile(ProtoFile);
+                var visitor = new MessageViewModel.Visitor();
+                visitor.Visit(ParseResult);
+                foreach (var m in visitor.Messages.Where(x => x.Parent == null))
+                {
+                    Messages.Add(m);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
         }
     }
 
@@ -117,12 +129,18 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private void ParseBinary()
     {
         TypedMessages = null;
-        if (ProtoBinFile is { } f && File.Exists(f))
+        try
         {
-            using var file = new FileStream(f, FileMode.Open, FileAccess.Read);
-            using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
-            var decoder = new TypedMessageDecoder();
-            TypedMessages = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
+            if (ProtoBinFile is { } f && File.Exists(f))
+            {
+                using var file = new FileStream(f, FileMode.Open, FileAccess.Read);
+                using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
+                var decoder = new TypedMessageDecoder();
+                TypedMessages = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
+            }
+        } catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
         }
     }
 

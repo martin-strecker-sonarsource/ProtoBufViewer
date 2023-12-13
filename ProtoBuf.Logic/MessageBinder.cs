@@ -34,8 +34,7 @@ namespace ProtoBuf.Logic
             {
                 var (index, type) = input.ReadWireTag();
                 var field = messageDef?.messageBody().messageElement().Select(x => x.field()).Where(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index).FirstOrDefault();
-                var fieldType = FitsFieldType(type, field.type_());
-                var parsedFields = messageDef != null && field != null && fieldType != FieldType.Unknown
+                var parsedFields = messageDef != null && field != null && FitsFieldType(type, field.type_()) is var fieldType and not FieldType.Unknown 
                     ? ParseField(input, protoContext, fieldType, field)
                     : ParseUnknownField(input, new WireTag(index, type));
                 fields.AddRange(parsedFields);
