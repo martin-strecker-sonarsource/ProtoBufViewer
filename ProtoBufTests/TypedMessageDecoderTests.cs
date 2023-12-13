@@ -1,6 +1,8 @@
 using FluentAssertions;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using ProtoBuf.Logic;
+using System.Xml.Linq;
 
 namespace ProtoBufTests
 {
@@ -235,6 +237,10 @@ namespace ProtoBufTests
                 new { MessageType = "MetricsInfo", },
                 new { MessageType = "MetricsInfo", },
             });
+            actual[0].Fields.Should().HaveCount(6);
+            // Packed integer
+            actual[0].Fields[2].Should().BeEquivalentTo(new { Name = "code_line", Index = 14, Value = new { Value = 1 } } );
+            actual[0].Fields[3].Should().BeEquivalentTo(new { Name = "code_line", Index = 14, Value = new { Value = 3 } } );
         }
 
 

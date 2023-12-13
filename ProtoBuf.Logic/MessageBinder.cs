@@ -8,6 +8,13 @@ namespace ProtoBuf.Logic
 {
     internal class MessageBinder : IMessage
     {
+        enum FieldType
+        {
+            Unknown,
+            Expected,
+            Packed
+        }
+
         private readonly ProtoContext protoContext;
         private readonly MessageDefContext? messageDef;
 
@@ -27,28 +34,50 @@ namespace ProtoBuf.Logic
             {
                 var (index, type) = input.ReadWireTag();
                 var field = messageDef?.messageBody().messageElement().Select(x => x.field()).Where(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index).FirstOrDefault();
-                var parsedField = messageDef != null && field != null && FitsFieldType(type, field.type_())
-                    ? ParseField(input, protoContext, messageDef, field)
+                var fieldType = FitsFieldType(type, field.type_());
+                var parsedFields = messageDef != null && field != null && fieldType != FieldType.Unknown
+                    ? ParseField(input, protoContext, fieldType, field)
                     : ParseUnknownField(input, new WireTag(index, type));
-                fields.Add(parsedField);
+                fields.AddRange(parsedFields);
             }
             Result = new TypedMessage(fields, messageDef);
         }
 
-        private TypedField ParseUnknownField(CodedInputStream stream, WireTag wireTag)
+        private IEnumerable<TypedField> ParseUnknownField(CodedInputStream stream, WireTag wireTag)
         {
             var (index, type) = wireTag;
             var value = stream.ReadType(type);
-            return new TypedField("Unknown", index, new TypedUnknown(value));
+            yield return new TypedField("Unknown", index, new TypedUnknown(value));
         }
 
-        private TypedField ParseField(CodedInputStream stream, ProtoContext protoContext, MessageDefContext message, FieldContext field)
+        private IEnumerable<TypedField> ParseField(CodedInputStream stream, ProtoContext protoContext, FieldType type, FieldContext field)
         {
-            var value = ReadExpectedType(stream, protoContext, field.type_());
-            return new TypedField(field.fieldName().GetText(), int.Parse(field.fieldNumber().GetText()), value);
+            var (fieldName, index) = (field.fieldName().GetText(), int.Parse(field.fieldNumber().GetText()));
+            var values = ReadExpectedType(stream, protoContext, type, field.type_());
+            foreach (var value in values)
+            {
+                yield return new TypedField(fieldName, index, value);
+            }
         }
 
-        private static ProtoType? ReadExpectedType(CodedInputStream stream, ProtoContext protoContext, Type_Context expectedType)
+        private static IEnumerable<ProtoType> ReadExpectedType(CodedInputStream stream, ProtoContext protoContext, FieldType type, Type_Context expectedType)
+        {
+            if (type == FieldType.Packed)
+            {
+                var length = stream.ReadLength();
+                var expectedEnd = stream.Position + length;
+                while (stream.Position < expectedEnd)
+                {
+                    yield return ReadExpectedType(stream, protoContext, expectedType);
+                }
+            }
+            else
+            {
+                yield return ReadExpectedType(stream, protoContext, expectedType);
+            }
+        }
+
+        private static ProtoType ReadExpectedType(CodedInputStream stream, ProtoContext protoContext, Type_Context expectedType)
         {
             if (expectedType.INT32() is not null)
                 return new TypedInt32(stream.ReadInt32());
@@ -154,7 +183,7 @@ namespace ProtoBuf.Logic
                 ? protoContext.topLevelDef().Select(x => x.enumDef())
                 : expectedType.AncestorsAndSelf().OfType<EnumDefContext>();
             searchRoot = searchRoot.Where(x => x != null);
-            var result = names.Skip(rootSearch ? 1 : 0).Aggregate(searchRoot, (parent, name) => [parent.FirstOrDefault(x => x.enumName().GetText() == name)], x=>x?.FirstOrDefault());
+            var result = names.Skip(rootSearch ? 1 : 0).Aggregate(searchRoot, (parent, name) => [parent.FirstOrDefault(x => x.enumName().GetText() == name)], x => x?.FirstOrDefault());
 
             if (result == null && !rootSearch)
             {
@@ -170,16 +199,17 @@ namespace ProtoBuf.Logic
             return builder.Result;
         }
 
-        private bool FitsFieldType(WireType actual, Type_Context expected)
+        private FieldType FitsFieldType(WireType actual, Type_Context expected)
         {
             return actual switch
             {
-                WireType.Varint => expected.INT32() is not null || expected.INT64() is not null || expected.UINT32() is not null || expected.SINT32() is not null || expected.SINT64() is not null || expected.BOOL() is not null || expected.enumType() is not null || expected.messageType() is not null,
-                WireType.Fixed64 => expected.FIXED64() is not null || expected.SFIXED64() is not null || expected.DOUBLE() is not null,
-                WireType.LengthDelimited => expected.STRING() is not null || expected.BYTES() is not null || expected.messageType() is not null,
+                WireType.Varint => expected.INT32() is not null || expected.INT64() is not null || expected.UINT32() is not null || expected.SINT32() is not null || expected.SINT64() is not null || expected.BOOL() is not null || expected.enumType() is not null || expected.messageType() is not null ? FieldType.Expected : FieldType.Unknown,
+                WireType.Fixed64 => expected.FIXED64() is not null || expected.SFIXED64() is not null || expected.DOUBLE() is not null ? FieldType.Expected : FieldType.Unknown,
+                WireType.LengthDelimited when expected.STRING() is not null || expected.BYTES() is not null || expected.messageType() is not null => FieldType.Expected,
+                WireType.LengthDelimited when expected.INT32() is not null || expected.INT64() is not null || expected.UINT32() is not null || expected.SINT32() is not null || expected.UINT64() is not null => FieldType.Packed,
                 WireType.StartGroup => throw new NotSupportedException(),
                 WireType.EndGroup => throw new NotSupportedException(),
-                WireType.Fixed32 => expected.FIXED32() is not null || expected.SFIXED32() is not null || expected.FLOAT() is not null,
+                WireType.Fixed32 => expected.FIXED32() is not null || expected.SFIXED32() is not null || expected.FLOAT() is not null ? FieldType.Expected : FieldType.Unknown,
                 _ => throw new NotSupportedException(),
             };
         }
