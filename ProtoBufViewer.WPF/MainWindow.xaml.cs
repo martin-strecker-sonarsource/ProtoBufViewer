@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using ProtoBuf.Logic;
+using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -18,6 +19,11 @@ namespace ProtoBufViewer.WPF
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            (this.DataContext as MainWindowViewModel).SelectedMessage = e.NewValue as MessageViewModel;
         }
     }
 }

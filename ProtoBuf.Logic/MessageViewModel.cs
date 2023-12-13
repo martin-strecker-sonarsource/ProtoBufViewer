@@ -32,6 +32,7 @@ namespace ProtoBuf.Logic
             public override bool VisitMessageDef(Protobuf3Parser.MessageDefContext context)
             {
                 var message = new MessageViewModel(context, context.messageName().GetText(), parent);
+                parent?.nested.Add(message);
                 messages.Add(message);
                 (var oldParent, parent) = (parent, message);
                 var result = base.VisitMessageDef(context);

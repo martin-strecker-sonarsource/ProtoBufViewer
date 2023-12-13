@@ -36,52 +36,50 @@
             </StackPanel>
         </HierarchicalDataTemplate>
     </Window.Resources>
-    <ScrollViewer>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button
                     Grid.Column="0"
                     x:Name="bt_OpenProto"
                     Content="Open Proto file"
                     Command="{Binding Path=OpenProtoCommand}" />
-                <Button
+            <Button
                     Grid.Column="1"
                     x:Name="bt_OpenBinary"
                     Content="Open encoded proto"
                     Command="{Binding Path=OpenBinaryCommand}" />
-            </Grid>
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <ListView
-                    Grid.Column="0"
-                    SelectedItem="{Binding Path=SelectedMessage}"
-                    ItemsSource="{Binding Path=Messages}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}">
-                                <TextBlock.ToolTip>
-                                    <TextBlock Text="{Binding Definition}" />
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                <TreeView Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" />
-            </Grid>
         </Grid>
-    </ScrollViewer>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TreeView
+                    Grid.Column="0"
+                    ItemsSource="{Binding Path=Messages}"
+                    SelectedItemChanged="TreeView_SelectedItemChanged">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Nested}">
+                        <TextBlock Text="{Binding Name}">
+                            <TextBlock.ToolTip>
+                                <TextBlock Text="{Binding Definition}" />
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <TreeView Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" />
+        </Grid>
+    </Grid>
 </Window>
