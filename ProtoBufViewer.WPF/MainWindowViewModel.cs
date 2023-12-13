@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Google.Protobuf;
-using Google.Protobuf.Reflection;
 using Microsoft.Win32;
 using ProtoBuf.Logic;
 using System.Collections.ObjectModel;
@@ -51,6 +50,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private async Task OpenOpenBinary()
     {
+        if (SelectedMessage == null || ParseResult == null)
+        {
+            return;
+        }
+
         OpenFileDialog openFileDialog = new();
         openFileDialog.Filter = "ProtoBuf Binary Files (*.pb)|*.pb";
         if (openFileDialog.ShowDialog() is true)
@@ -58,7 +62,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             using var file = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
             using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
             var decoder = new TypedMessageDecoder();
-            var parseResult = decoder.Parse(coded, this.ParseResult, SelectedMessage.MessageDefContext);
+            var parseResult = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
         }
     }
 
