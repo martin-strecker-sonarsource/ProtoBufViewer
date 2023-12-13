@@ -19,6 +19,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
     {
         OpenProtoCommand = new AsyncRelayCommand(OpenProto);
         OpenBinaryCommand = new AsyncRelayCommand(OpenOpenBinary, () => SelectedMessage != null);
+        ProtoFile = Settings.Default.ProtoFile;
+        SelectedMessage = Messages.FirstOrDefault(x => x.Name == Settings.Default.SelectedMessage);
+        if (SelectedMessage != null)
+        {
+            ProtoBinFile = Settings.Default.ProtoBinFile;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -27,13 +33,24 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public AsyncRelayCommand OpenBinaryCommand { get; }
 
     public ObservableCollection<MessageViewModel> Messages { get; } = new();
-    public MessageViewModel? SelectedMessage { get => selectedMessage; set { selectedMessage = value; OnPropertyChanged(); OpenBinaryCommand.NotifyCanExecuteChanged(); } }
+    public MessageViewModel? SelectedMessage
+    {
+        get => selectedMessage;
+        set
+        {
+            selectedMessage = value;
+            OnPropertyChanged();
+            OpenBinaryCommand.NotifyCanExecuteChanged();
+            Settings.Default.SelectedMessage = value?.Name;
+            Settings.Default.Save();
+        }
+    }
 
     protected ProtoContext? ParseResult { get => parseResult; set { parseResult = value; OnPropertyChanged(); } }
 
 
-    private ObservableCollection<TypedMessage> typedMessages;
-    public ObservableCollection<TypedMessage> TypedMessages { get => typedMessages; set { typedMessages = value; OnPropertyChanged(); } }
+    private IReadOnlyCollection<TypedMessage>? typedMessages;
+    public IReadOnlyCollection<TypedMessage>? TypedMessages { get => typedMessages; set { typedMessages = value; OnPropertyChanged(); } }
     public string ProtoFile
     {
         get => Settings.Default.ProtoFile;
@@ -42,6 +59,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             Settings.Default.ProtoFile = value;
             Settings.Default.Save();
             OnPropertyChanged();
+            ParseProto();
         }
     }
     public string ProtoBinFile
@@ -52,6 +70,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             Settings.Default.ProtoBinFile = value;
             Settings.Default.Save();
             OnPropertyChanged();
+            ParseBinary();
         }
     }
 
@@ -62,9 +81,16 @@ public class MainWindowViewModel : INotifyPropertyChanged
         if (openFileDialog.ShowDialog() is true)
         {
             ProtoFile = openFileDialog.FileName;
-            ParseResult = (ProtoContext?)ProtoParser.ParseFile(openFileDialog.FileName);
+        }
+    }
+
+    private void ParseProto()
+    {
+        Messages.Clear();
+        if (ProtoFile is { } file && File.Exists(file))
+        {
+            ParseResult = ProtoParser.ParseFile(ProtoFile);
             var visitor = new MessageViewModel.Visitor();
-            Messages.Clear();
             visitor.Visit(ParseResult);
             foreach (var m in visitor.Messages.Where(x => x.Parent == null))
             {
@@ -85,10 +111,18 @@ public class MainWindowViewModel : INotifyPropertyChanged
         if (openFileDialog.ShowDialog() is true)
         {
             ProtoBinFile = openFileDialog.FileName;
-            using var file = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
+        }
+    }
+
+    private void ParseBinary()
+    {
+        TypedMessages = null;
+        if (ProtoBinFile is { } f && File.Exists(f))
+        {
+            using var file = new FileStream(f, FileMode.Open, FileAccess.Read);
             using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
             var decoder = new TypedMessageDecoder();
-            TypedMessages = new ObservableCollection<TypedMessage>(decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext));
+            TypedMessages = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
         }
     }
 

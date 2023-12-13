@@ -46,5 +46,17 @@ namespace ProtoBufViewer.WPF {
                 this["ProtoBinFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SelectedMessage {
+            get {
+                return ((string)(this["SelectedMessage"]));
+            }
+            set {
+                this["SelectedMessage"] = value;
+            }
+        }
     }
 }
