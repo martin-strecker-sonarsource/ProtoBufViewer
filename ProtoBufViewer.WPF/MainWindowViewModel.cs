@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Google.Protobuf;
+using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
 using ProtoBuf.Logic;
 using System.Collections.ObjectModel;
@@ -23,11 +24,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
         OpenBinaryCommand = new AsyncRelayCommand(OpenOpenBinary, () => SelectedMessage != null);
         Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
         {
-            ProtoFile = Settings.Default.ProtoFile;
+            ProtoFile = new(Settings.Default.ProtoFile ?? SpecialDirectories.MyDocuments);
             SelectedMessage = Messages.FirstOrDefault(x => x.Name == Settings.Default.SelectedMessage);
             if (SelectedMessage != null)
             {
-                ProtoBinFile = Settings.Default.ProtoBinFile;
+                ProtoBinFile = new(Settings.Default.ProtoBinFile ?? SpecialDirectories.MyDocuments);
             }
         }));
     }
@@ -56,23 +57,23 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private IReadOnlyCollection<TypedMessage>? typedMessages;
     public IReadOnlyCollection<TypedMessage>? TypedMessages { get => typedMessages; set { typedMessages = value; OnPropertyChanged(); } }
-    public string ProtoFile
+    public FileInfo ProtoFile
     {
-        get => Settings.Default.ProtoFile;
+        get => new(Settings.Default.ProtoFile);
         set
         {
-            Settings.Default.ProtoFile = value;
+            Settings.Default.ProtoFile = value?.FullName;
             Settings.Default.Save();
             OnPropertyChanged();
             ParseProto();
         }
     }
-    public string ProtoBinFile
+    public FileInfo ProtoBinFile
     {
-        get => Settings.Default.ProtoBinFile;
+        get => new(Settings.Default.ProtoBinFile);
         set
         {
-            Settings.Default.ProtoBinFile = value;
+            Settings.Default.ProtoBinFile = value?.FullName;
             Settings.Default.Save();
             OnPropertyChanged();
             ParseBinary();
@@ -85,7 +86,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         openFileDialog.Filter = "ProtoBuf Files (*.proto)|*.proto";
         if (openFileDialog.ShowDialog() is true)
         {
-            ProtoFile = openFileDialog.FileName;
+            ProtoFile = new(openFileDialog.FileName);
         }
     }
 
@@ -94,9 +95,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
         try
         {
             Messages.Clear();
-            if (ProtoFile is { } file && File.Exists(file))
+            if (ProtoFile is { Exists: true, FullName: { } file } )
             {
-                ParseResult = ProtoParser.ParseFile(ProtoFile);
+                ParseResult = ProtoParser.ParseFile(file);
                 var visitor = new MessageViewModel.Visitor();
                 visitor.Visit(ParseResult);
                 foreach (var m in visitor.Messages.Where(x => x.Parent == null))
@@ -122,7 +123,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         openFileDialog.Filter = "ProtoBuf Binary Files (*.pb)|*.pb";
         if (openFileDialog.ShowDialog() is true)
         {
-            ProtoBinFile = openFileDialog.FileName;
+            ProtoBinFile = new(openFileDialog.FileName);
         }
     }
 
@@ -131,10 +132,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
         TypedMessages = null;
         try
         {
-            if (ProtoBinFile is { } f && File.Exists(f))
+            if (ProtoBinFile is { Exists: true, FullName: { } file })
             {
-                using var file = new FileStream(f, FileMode.Open, FileAccess.Read);
-                using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
+                using var fs = new FileStream(file, FileMode.Open, FileAccess.Read);
+                using var coded = CodedInputStream.CreateWithLimits(fs, int.MaxValue, int.MaxValue);
                 var decoder = new TypedMessageDecoder();
                 TypedMessages = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
             }
