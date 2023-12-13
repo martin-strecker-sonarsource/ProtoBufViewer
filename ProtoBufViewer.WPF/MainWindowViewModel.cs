@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using static Protobuf3Parser;
+using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBufViewer.WPF;
 
