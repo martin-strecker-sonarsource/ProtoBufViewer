@@ -26,8 +26,8 @@ namespace ProtoBuf.Logic
             while (input.Position < targetPosition && !input.IsAtEnd)
             {
                 var (index, type) = input.ReadWireTag();
-                var field = messageDef.messageBody().messageElement().Select(x => x.field()).Where(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index).FirstOrDefault();
-                var parsedField = field != null && FitsFieldType(type, field.type_())
+                var field = messageDef?.messageBody().messageElement().Select(x => x.field()).Where(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index).FirstOrDefault();
+                var parsedField = messageDef != null && field != null && FitsFieldType(type, field.type_())
                     ? ParseField(input, protoContext, messageDef, field)
                     : ParseUnknownField(input, new WireTag(index, type));
                 fields.Add(parsedField);
