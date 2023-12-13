@@ -16,11 +16,22 @@
         <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedField}" ItemsSource="{Binding Path=Value.Fields}">
             <StackPanel Orientation="Horizontal">
                 <!--<TextBlock Text="TypedField: " />-->
-                <TextBlock Text="{Binding Name}" />
+                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
                 <TextBlock Text=": " />
                 <ContentPresenter Content="{Binding Value}" />
             </StackPanel>
         </HierarchicalDataTemplate>
+
+        <DataTemplate DataType="{x:Type protobufLogic:TypedEnum}">
+            <StackPanel Orientation="Horizontal">
+                <!--<TextBlock Text="ProtoTypeValue: " />-->
+                <TextBlock Text="{Binding EnumValue}">
+                    <TextBlock.ToolTip>
+                        <TextBlock Text="{Binding Definition}" />
+                    </TextBlock.ToolTip>
+                </TextBlock>
+            </StackPanel>
+        </DataTemplate>
 
         <DataTemplate DataType="{x:Type protobufLogic:ProtoType}">
             <StackPanel Orientation="Horizontal">
