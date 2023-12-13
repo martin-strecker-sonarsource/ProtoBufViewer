@@ -7,19 +7,15 @@ namespace ProtoBufTests
     [TestClass]
     [DeploymentItem(@"Artefacts\AnalyzerReport.proto")]
     [DeploymentItem(@"Artefacts\token-type.pb")]
-    [DeploymentItem(@"Artefacts\symrefs.pb.pb")]
+    [DeploymentItem(@"Artefacts\symrefs.pb")]
+    [DeploymentItem(@"Artefacts\file-metadata.pb")]
+    [DeploymentItem(@"Artefacts\log.pb")]
     public class TypedMessageDecoderTests
     {
         [TestMethod]
         public void TypedMessageDecoder_TokenType()
         {
-            var proto = ProtoParser.ParseFile("AnalyzerReport.proto");
-            var tokenTypeInfo = proto.topLevelDef().Where(x => x.messageDef()?.messageName().GetText() == "TokenTypeInfo").First().messageDef();
-            var bytes = File.ReadAllBytes("token-type.pb");
-            using var memory = new MemoryStream(bytes.Skip(0).ToArray());
-            using var stream = CodedInputStream.CreateWithLimits(memory, int.MaxValue, int.MaxValue);
-            var decoder = new TypedMessageDecoder();
-            var actual = decoder.Parse(stream, proto, tokenTypeInfo);
+            IReadOnlyList<TypedMessage> actual = ParseBinary("token-type.pb", "TokenTypeInfo");
             var tokenType = actual.Should().ContainSingle().Which;
             tokenType.Should().BeEquivalentTo(new { MessageType = "TokenTypeInfo", Type = "Message" });
             tokenType.Fields.Should().HaveCount(127);
@@ -49,12 +45,150 @@ namespace ProtoBufTests
         }
 
         [TestMethod]
-        public void Sample_Base64()
+        public void TypedMessageDecoder_SymbolReferenceInfo()
         {
-            var bytes = File.ReadAllBytes("token-type.pb");
-            var skipped = bytes.Skip(2).ToArray();
-            var base64 = Convert.ToBase64String(skipped);
-            // https://protobuf-decoder.netlify.app/
+            IReadOnlyList<TypedMessage> actual = ParseBinary("symrefs.pb", "SymbolReferenceInfo");
+            actual.Should().HaveCount(2);
+            var symRef = actual[0];
+            symRef.Should().BeEquivalentTo(new
+            {
+                MessageType = "SymbolReferenceInfo",
+                Type = "Message",
+                Fields = new[]
+                {
+                    new
+                    {
+                        Name = "file_path",
+                        Value = (object)new { Value = @"C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\ClassB.cs" },
+                    },
+                    new
+                    {
+                        Name = "reference",
+                        Value = (object)new
+                        {
+                            Fields = new[]
+                            {
+                                new
+                                {
+                                    Name = "declaration",
+                                    Value = new
+                                    {
+                                        Fields = new[]
+                                        {
+                                            new { Name = "start_line" },
+                                            new { Name = "end_line" },
+                                            new { Name = "start_offset" },
+                                            new { Name = "end_offset" },
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        public void TypedMessageDecoder_FileMetadata()
+        {
+            IReadOnlyList<TypedMessage> actual = ParseBinary("file-metadata.pb", "FileMetadataInfo");
+            actual.Should().BeEquivalentTo(new[]
+            {
+                new
+                {
+                    Fields = new[]
+                    {
+                        new
+                        {
+                            Name = "file_path",
+                            Value = new { Value = (object)@"C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\ClassB.cs" }
+                        },
+                        new
+                        {
+                            Name = "encoding",
+                            Value = new { Value = (object)@"utf-8" }
+                        },
+                    }
+                },
+                new
+                {
+                    Fields = new[]
+                    {
+                        new
+                        {
+                            Name = "file_path",
+                            Value = new { Value = (object)@"C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\ClassC.cs" }
+                        },
+                        new
+                        {
+                            Name = "encoding",
+                            Value = new { Value = (object)@"utf-8" }
+                        },
+                    }
+                },
+                new
+                {
+                    Fields = new[]
+                    {
+                        new
+                        {
+                            Name = "file_path",
+                            Value = new { Value = (object)@"C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\obj\Debug\netstandard2.0\.NETStandard,Version=v2.0.AssemblyAttributes.cs" }
+                        },
+                        new
+                        {
+                            Name = "is_generated",
+                            Value = new { Value = (object)true }
+                        },
+                        new
+                        {
+                            Name = "encoding",
+                            Value = new { Value = (object)@"utf-8" }
+                        },
+                    }
+                },
+                new
+                {
+                    Fields = new[]
+                    {
+                        new
+                        {
+                            Name = "file_path",
+                            Value = new { Value = (object)@"C:\Projects\Sprints\UtilityAnalyzerPerf\Benchmark\Projects\fluentassertions\Tests\AssemblyB\obj\Debug\netstandard2.0\AssemblyB.AssemblyInfo.cs" }
+                        },
+                        new
+                        {
+                            Name = "is_generated",
+                            Value = new { Value = (object)true }
+                        },
+                        new
+                        {
+                            Name = "encoding",
+                            Value = new { Value = (object)@"utf-8" }
+                        },
+                    }
+                },
+            });
+        }
+
+        [TestMethod]
+        public void TypedMessageDecoder_Log()
+        {
+            IReadOnlyList<TypedMessage> actual = ParseBinary("log.pb", "LogInfo");
+            actual.Should().BeEquivalentTo(new string[] { });
+        }
+
+        private static IReadOnlyList<TypedMessage> ParseBinary(string pbFile, string protoDefinition)
+        {
+            var bytes = File.ReadAllBytes(pbFile);
+            using var memory = new MemoryStream(bytes.Skip(0).ToArray());
+            using var stream = CodedInputStream.CreateWithLimits(memory, int.MaxValue, int.MaxValue);
+            var decoder = new TypedMessageDecoder();
+            var proto = ProtoParser.ParseFile("AnalyzerReport.proto");
+            var tokenTypeInfo = proto.topLevelDef().Where(x => x.messageDef()?.messageName().GetText() == protoDefinition).First().messageDef();
+            var actual = decoder.Parse(stream, proto, tokenTypeInfo);
+            return actual;
         }
     }
 }
