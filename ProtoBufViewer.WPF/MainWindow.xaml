@@ -15,7 +15,7 @@
 
         <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedField}" ItemsSource="{Binding Path=Value.Fields}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="TypedField: " />
+                <!--<TextBlock Text="TypedField: " />-->
                 <TextBlock Text="{Binding Name}" />
                 <TextBlock Text=": " />
                 <ContentPresenter Content="{Binding Value}" />
@@ -24,64 +24,62 @@
 
         <DataTemplate DataType="{x:Type protobufLogic:ProtoType}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="ProtoTypeValue: " />
+                <!--<TextBlock Text="ProtoTypeValue: " />-->
                 <TextBlock Text="{Binding Value}" />
             </StackPanel>
         </DataTemplate>
 
         <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedMessage}" ItemsSource="{Binding Fields}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="TypedMessage: " />
+                <!--<TextBlock Text="TypedMessage: " />-->
                 <TextBlock Text="{Binding MessageType}" />
             </StackPanel>
         </HierarchicalDataTemplate>
     </Window.Resources>
-    <ScrollViewer>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button
                     Grid.Column="0"
                     x:Name="bt_OpenProto"
                     Content="Open Proto file"
                     Command="{Binding Path=OpenProtoCommand}" />
-                <Button
+            <Button
                     Grid.Column="1"
                     x:Name="bt_OpenBinary"
                     Content="Open encoded proto"
                     Command="{Binding Path=OpenBinaryCommand}" />
-            </Grid>
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <ListView
+            <ListView
                     Grid.Column="0"
                     SelectedItem="{Binding Path=SelectedMessage}"
                     ItemsSource="{Binding Path=Messages}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}">
-                                <TextBlock.ToolTip>
-                                    <TextBlock Text="{Binding Definition}" />
-                                </TextBlock.ToolTip>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}">
+                            <TextBlock.ToolTip>
+                                <TextBlock Text="{Binding Definition}" />
+                            </TextBlock.ToolTip>
                             </TextBlock>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                <TreeView Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" />
-            </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TreeView ScrollViewer.VerticalScrollBarVisibility="Auto" Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" />
         </Grid>
-    </ScrollViewer>
+    </Grid>
 </Window>
