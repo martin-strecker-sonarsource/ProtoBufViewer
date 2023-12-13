@@ -34,6 +34,26 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private ObservableCollection<TypedMessage> typedMessages;
     public ObservableCollection<TypedMessage> TypedMessages { get => typedMessages; set { typedMessages = value; OnPropertyChanged(); } }
+    public string ProtoFile
+    {
+        get => Settings.Default.ProtoFile;
+        set
+        {
+            Settings.Default.ProtoFile = value;
+            Settings.Default.Save();
+            OnPropertyChanged();
+        }
+    }
+    public string ProtoBinFile
+    {
+        get => Settings.Default.ProtoBinFile;
+        set
+        {
+            Settings.Default.ProtoBinFile = value;
+            Settings.Default.Save();
+            OnPropertyChanged();
+        }
+    }
 
     private async Task OpenProto()
     {
@@ -41,6 +61,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         openFileDialog.Filter = "ProtoBuf Files (*.proto)|*.proto";
         if (openFileDialog.ShowDialog() is true)
         {
+            ProtoFile = openFileDialog.FileName;
             ParseResult = (ProtoContext?)ProtoParser.ParseFile(openFileDialog.FileName);
             var visitor = new MessageViewModel.Visitor();
             Messages.Clear();
@@ -63,6 +84,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         openFileDialog.Filter = "ProtoBuf Binary Files (*.pb)|*.pb";
         if (openFileDialog.ShowDialog() is true)
         {
+            ProtoBinFile = openFileDialog.FileName;
             using var file = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
             using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
             var decoder = new TypedMessageDecoder();
