@@ -57,29 +57,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
         {
             using var file = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
             using var coded = CodedInputStream.CreateWithLimits(file, int.MaxValue, int.MaxValue);
-            var tag = coded.ReadWireTag(); // ignore the first Tag
-            tag = coded.ReadWireTag();
-            var text = coded.ReadString();
-            tag = coded.PeekWireTag();
-            var message = new TestMessage();
-            coded.ReadRawMessage(message);
+            var decoder = new TypedMessageDecoder();
+            var parseResult = decoder.Parse(coded, this.ParseResult, SelectedMessage.MessageDefContext);
         }
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string name = "") =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-}
-class TestMessage : IMessage
-{
-    public MessageDescriptor Descriptor => throw new NotImplementedException();
-
-    public int CalculateSize() => throw new NotImplementedException();
-
-    public void WriteTo(CodedOutputStream output) => throw new NotImplementedException();
-
-    public void MergeFrom(CodedInputStream input)
-    {
-        var tag = input.ReadTag();
-        var enuma = input.ReadEnum();
-    }
 }
