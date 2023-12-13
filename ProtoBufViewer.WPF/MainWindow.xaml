@@ -24,12 +24,13 @@
 
         <DataTemplate DataType="{x:Type protobufLogic:TypedEnum}">
             <StackPanel Orientation="Horizontal">
+                <StackPanel.ToolTip>
+                    <TextBlock Text="{Binding Definition}" />
+                </StackPanel.ToolTip>
                 <!--<TextBlock Text="ProtoTypeValue: " />-->
-                <TextBlock Text="{Binding EnumValue}">
-                    <TextBlock.ToolTip>
-                        <TextBlock Text="{Binding Definition}" />
-                    </TextBlock.ToolTip>
-                </TextBlock>
+                <TextBlock Text="{Binding EnumValue}" />
+                <TextBlock Text=" = " />
+                <TextBlock Text="{Binding Value}" />
             </StackPanel>
         </DataTemplate>
 

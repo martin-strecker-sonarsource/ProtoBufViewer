@@ -1,4 +1,5 @@
-﻿using Google.Protobuf;
+﻿using Antlr4.Runtime.Misc;
+using Google.Protobuf;
 using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBuf.Logic
@@ -29,6 +30,15 @@ namespace ProtoBuf.Logic
         public string EnumType => EnumDef == null ? "Unknown enum type" : EnumDef.enumName().GetText();
         public string EnumValue => EnumDef?.enumBody().enumElement().FirstOrDefault(
             x => int.Parse(x.enumField().intLit().INT_LIT().Symbol.Text) == Value)?.enumField().ident().GetText() ?? "Unknown";
+        public string Definition => GetFullText(EnumDef);
+
+        public static string GetFullText(EnumDefContext context)
+        {
+            if (context.Start == null || context.Stop == null || context.Start.StartIndex < 0 || context.Stop.StopIndex < 0)
+                return context.GetText(); // Fallback
+
+            return context.Start.InputStream.GetText(Interval.Of(context.Start.StartIndex, context.Stop.StopIndex));
+        }
     }
 
     public sealed record class TypedField(string Name, int Index, ProtoType Value);
