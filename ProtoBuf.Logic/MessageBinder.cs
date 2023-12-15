@@ -1,12 +1,13 @@
 ﻿using Antlr4.Runtime;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using ProtoBuf.Antlr;
 using static Google.Protobuf.WireFormat;
 using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBuf.Logic
 {
-    internal class MessageBinder : IMessage
+    internal class MessageBinder(ProtoContext protoContext, MessageDefContext? messageDef) : IMessage
     {
         enum FieldType
         {
@@ -15,14 +16,6 @@ namespace ProtoBuf.Logic
             Packed
         }
 
-        private readonly ProtoContext protoContext;
-        private readonly MessageDefContext? messageDef;
-
-        public MessageBinder(ProtoContext protoContext, MessageDefContext? messageDef)
-        {
-            this.protoContext = protoContext;
-            this.messageDef = messageDef;
-        }
         public TypedMessage? Result { get; internal set; }
 
         public void MergeFrom(CodedInputStream input)
@@ -33,7 +26,7 @@ namespace ProtoBuf.Logic
             while (input.Position < targetPosition && !input.IsAtEnd)
             {
                 var (index, type) = input.ReadWireTag();
-                var field = messageDef?.messageBody().messageElement().Select(x => x.field()).Where(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index).FirstOrDefault();
+                var field = messageDef?.messageBody().messageElement().Select(x => x.field()).FirstOrDefault(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index);
                 var parsedFields = messageDef != null && field != null && FitsFieldType(type, field.type_()) is var fieldType and not FieldType.Unknown
                     ? ParseField(input, protoContext, fieldType, field)
                     : ParseUnknownField(input, new WireTag(index, type));
@@ -114,9 +107,7 @@ namespace ProtoBuf.Logic
                 return new TypedString(stream.ReadString());
             else if (expectedType.enumType() is not null || expectedType.messageType() is not null)
             {
-                var (enumType, messageType) = (expectedType.enumType(), expectedType.messageType());
-                var bound = BindMessageOrEnumDef(protoContext, DottedNames(enumType).Concat(DottedNames(messageType)), expectedType);
-                return bound switch
+                return BindMessageOrEnumDef(protoContext, expectedType) switch
                 {
                     EnumDefContext enumDef => new TypedEnum(stream.ReadEnum(), enumDef),
                     MessageDefContext innerMessageDef => ParseMessage(stream, protoContext, innerMessageDef),
@@ -163,38 +154,28 @@ namespace ProtoBuf.Logic
             yield return name.GetText();
         }
 
-        private static ParserRuleContext? BindMessageOrEnumDef(ProtoContext protoContext, IEnumerable<string> names, Type_Context expectedType) =>
-            BindMessageDef(protoContext, names, expectedType) ?? BindEnumDef(protoContext, names, expectedType);
-
-        private static ParserRuleContext? BindMessageDef(ProtoContext protoContext, IEnumerable<string> names, Type_Context expectedType)
+        private static ParserRuleContext? BindMessageOrEnumDef(ProtoContext protoContext, Type_Context expectedType)
         {
-            bool rootSearch = names.FirstOrDefault() == ".";
-            var searchRoot = rootSearch
-                ? protoContext.topLevelDef().Select(x => x.messageDef())
-                : expectedType.AncestorsAndSelf().OfType<MessageDefContext>().SelectMany(x => x.messageBody().messageElement().Select(x => x.messageDef()));
-            searchRoot = searchRoot.Where(x => x != null);
-            var result = names.Skip(rootSearch ? 1 : 0).Aggregate(searchRoot, (parent, name) => [parent.FirstOrDefault(x => x?.messageName()?.GetText() == name)], x => x?.FirstOrDefault());
-            if (result is null && !rootSearch)
+            var names = (expectedType.enumType(), expectedType.messageType()) switch
             {
-                return BindMessageDef(protoContext, new[] { "." }.Concat(names), expectedType);
-            }
-            return result;
+                (null, { } messageType) => DottedNames(messageType),
+                ({ } enumType, null) => DottedNames(enumType),
+                _ => throw new InvalidOperationException(),
+            };
+            return BindType(protoContext, names, expectedType, names => new MessageDefBinder(names)) as ParserRuleContext
+                ?? BindType(protoContext, names, expectedType, names => new EnumDefBinder(names));
         }
 
-        private static ParserRuleContext? BindEnumDef(ProtoContext protoContext, IEnumerable<string> names, Type_Context expectedType)
+        private static T? BindType<T>(ProtoContext protoContext, IEnumerable<string> names, Type_Context expectedType, Func<IEnumerable<string>, IProtobuf3Visitor<T>> visitorFactory)
         {
-            bool rootSearch = names.FirstOrDefault() == ".";
-            var searchRoot = rootSearch
-                ? protoContext.topLevelDef().Select(x => x.enumDef())
-                : expectedType.AncestorsAndSelf().OfType<EnumDefContext>();
-            searchRoot = searchRoot.Where(x => x != null);
-            var result = names.Skip(rootSearch ? 1 : 0).Aggregate(searchRoot, (parent, name) => [parent.FirstOrDefault(x => x.enumName().GetText() == name)], x => x?.FirstOrDefault());
-
-            if (result == null && !rootSearch)
+            var rootSearch = names.FirstOrDefault() == ".";
+            if (!rootSearch
+                && expectedType.AncestorsAndSelf().OfType<MessageDefContext>().FirstOrDefault() is { } parentDefinitionContext
+                && visitorFactory(names).Visit(parentDefinitionContext.messageBody()) is { } relative)
             {
-                return BindEnumDef(protoContext, new[] { "." }.Concat(names), expectedType);
+                return relative;
             }
-            return result;
+            return visitorFactory(rootSearch ? names.Skip(1) : names).Visit(protoContext);
         }
 
         private static ProtoType? ParseMessage(CodedInputStream stream, ProtoContext protoContext, MessageDefContext? messageDef)
@@ -222,5 +203,47 @@ namespace ProtoBuf.Logic
         MessageDescriptor IMessage.Descriptor => throw new NotImplementedException();
         void IMessage.WriteTo(CodedOutputStream output) => throw new NotImplementedException();
         int IMessage.CalculateSize() => throw new NotImplementedException();
+
+        sealed class MessageDefBinder(IEnumerable<string> names) : Protobuf3BaseVisitor<MessageDefContext>
+        {
+            private readonly Queue<string> Names = new(names);
+            protected override MessageDefContext? AggregateResult(MessageDefContext aggregate, MessageDefContext nextResult) =>
+                aggregate ?? nextResult;
+
+            public override MessageDefContext? VisitMessageDef(MessageDefContext context)
+            {
+                if (Names.TryPeek(out var name) && context.messageName().GetText() == name)
+                {
+                    Names.Dequeue();
+                    if (Names.Count == 0)
+                    {
+                        return context;
+                    }
+                    return base.VisitMessageDef(context);
+                }
+                return null;
+            }
+        }
+
+        sealed class EnumDefBinder(IEnumerable<string> names) : Protobuf3BaseVisitor<EnumDefContext>
+        {
+            private readonly Queue<string> Names = new(names);
+            protected override EnumDefContext? AggregateResult(EnumDefContext? aggregate, EnumDefContext? nextResult) =>
+                aggregate ?? nextResult;
+
+            public override EnumDefContext? VisitEnumDef(EnumDefContext context)
+            {
+                if (Names.TryPeek(out var name) && context.enumName().GetText() == name)
+                {
+                    Names.Dequeue();
+                    if (Names.Count == 0)
+                    {
+                        return context;
+                    }
+                    return base.VisitEnumDef(context);
+                }
+                return null;
+            }
+        }
     }
 }
