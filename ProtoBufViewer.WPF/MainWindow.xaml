@@ -6,11 +6,7 @@
         xmlns:local="clr-namespace:ProtoBufViewer.WPF"
         xmlns:protobufLogic="clr-namespace:ProtoBuf.Logic;assembly=ProtoBuf.Logic"
         mc:Ignorable="d"
-        Title="ProtoBuf Viewer" Height="450" Width="800"
-        FontSize="20">
-    <Window.DataContext>
-        <local:MainWindowViewModel />
-    </Window.DataContext>
+        Title="ProtoBuf Viewer">
     <Window.Resources>
         <HierarchicalDataTemplate DataType="{x:Type protobufLogic:TypedField}" ItemsSource="{Binding Path=Value.Fields}">
             <StackPanel Orientation="Horizontal">
@@ -61,6 +57,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" MinWidth="120"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button
@@ -75,24 +72,22 @@
                     Content="Open encoded proto"
                     Command="{Binding Path=OpenBinaryCommand}"
                     Margin="5" />
-        </Grid>
-        <Grid Grid.Row="1" Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="{Binding Path=ProtoFile.Name}" />
-            <TextBlock Grid.Column="2" Text="{Binding Path=ProtoBinFile.Name}" />
+            <TextBox Grid.Column="2" Text="{Binding SearchText, Delay=300}" />
         </Grid>
         <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Path=ProtoFile.Name}" />
             <TreeView
+                    Grid.Row="1"
                     Grid.Column="0"
+                    Name="tv_messages"
                     ItemsSource="{Binding Path=Messages}"
                     SelectedItemChanged="TreeView_SelectedItemChanged">
                 <TreeView.ItemTemplate>
@@ -105,7 +100,13 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-            <TreeView ScrollViewer.VerticalScrollBarVisibility="Auto"  Grid.Column="1" ItemsSource="{Binding Path=TypedMessages}" />
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Path=ProtoBinFile.Name}" />
+            <TreeView 
+                Grid.Row="1"
+                Grid.Column="2" 
+                Name="tv_TypedMessages"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"  
+                ItemsSource="{Binding Path=TypedMessages}" />
         </Grid>
     </Grid>
 </Window>

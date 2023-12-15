@@ -20,23 +20,23 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     public MainWindowViewModel()
     {
-        OpenProtoCommand = new AsyncRelayCommand(OpenProto);
-        OpenBinaryCommand = new AsyncRelayCommand(OpenOpenBinary, () => SelectedMessage != null);
+        OpenProtoCommand = new RelayCommand(OpenProto);
+        OpenBinaryCommand = new RelayCommand(OpenBinary, () => SelectedMessage != null);
         Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
         {
             ProtoFile = new(Settings.Default.ProtoFile ?? SpecialDirectories.MyDocuments);
             SelectedMessage = Messages.FirstOrDefault(x => x.Name == Settings.Default.SelectedMessage);
-            if (SelectedMessage != null)
+            if (SelectedMessage != null && Settings.Default.ProtoBinFile is { } binFile)
             {
-                ProtoBinFile = new(Settings.Default.ProtoBinFile ?? SpecialDirectories.MyDocuments);
+                ProtoBinFile = new(binFile);
             }
         }));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public AsyncRelayCommand OpenProtoCommand { get; }
-    public AsyncRelayCommand OpenBinaryCommand { get; }
+    public RelayCommand OpenProtoCommand { get; }
+    public RelayCommand OpenBinaryCommand { get; }
 
     public ObservableCollection<MessageViewModel> Messages { get; } = new();
     public MessageViewModel? SelectedMessage
@@ -56,6 +56,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
 
     private IReadOnlyCollection<TypedMessage>? typedMessages;
+    private string searchText;
+
     public IReadOnlyCollection<TypedMessage>? TypedMessages { get => typedMessages; set { typedMessages = value; OnPropertyChanged(); } }
     public FileInfo ProtoFile
     {
@@ -80,7 +82,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task OpenProto()
+    public Action<IEnumerable<ProtoType>> SelectTypedMessage { get; internal set; }
+
+    private void OpenProto()
     {
         OpenFileDialog openFileDialog = new();
         openFileDialog.Filter = "ProtoBuf Files (*.proto)|*.proto";
@@ -95,7 +99,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         try
         {
             Messages.Clear();
-            if (ProtoFile is { Exists: true, FullName: { } file } )
+            if (ProtoFile is { Exists: true, FullName: { } file })
             {
                 ParseResult = ProtoParser.ParseFile(file);
                 var visitor = new MessageViewModel.Visitor();
@@ -112,7 +116,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task OpenOpenBinary()
+    private void OpenBinary()
     {
         if (SelectedMessage == null || ParseResult == null)
         {
@@ -139,9 +143,60 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 var decoder = new TypedMessageDecoder();
                 TypedMessages = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
             }
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             MessageBox.Show(ex.Message);
+        }
+    }
+
+    public string SearchText
+    {
+        get => searchText;
+        set
+        {
+            searchText = value;
+            DoSearch();
+            OnPropertyChanged();
+        }
+    }
+
+    private void DoSearch()
+    {
+        var stack = new Stack<ProtoType>();
+        foreach (var m in TypedMessages ?? Enumerable.Empty<TypedMessage>())
+        {
+            stack.Push(m);
+            if (FindMessage(stack, SearchText))
+            {
+                SelectTypedMessage(stack.Reverse());
+                return;
+            }
+            stack.Pop();
+        }
+
+        static bool FindMessage(Stack<ProtoType> stack, string searchText)
+        {
+            var current = stack.Peek();
+            switch (current)
+            {
+                case TypedString s when s.Value.Contains(searchText): return true;
+                case TypedBool b when searchText.Equals("true", StringComparison.OrdinalIgnoreCase) && b.Value: return true;
+                case TypedBool b when searchText.Equals("false", StringComparison.OrdinalIgnoreCase) && !b.Value: return true;
+                case TypedUnknown u when u.Value is string s && s.Contains(searchText): return true;
+                case TypedMessage m:
+                    foreach (var f in m.Fields)
+                    {
+                        stack.Push(f.Value);
+                        if (FindMessage(stack, searchText))
+                        {
+                            return true;
+                        }
+                        stack.Pop();
+                    }
+                    break;
+            }
+            return false;
         }
     }
 

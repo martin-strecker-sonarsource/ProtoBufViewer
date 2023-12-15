@@ -1,5 +1,8 @@
 ﻿using ProtoBuf.Logic;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 
 namespace ProtoBufViewer.WPF
 {
@@ -11,11 +14,52 @@ namespace ProtoBufViewer.WPF
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainWindowViewModel();
+            ViewModel.SelectTypedMessage = SelectTypedMessage;
         }
 
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        public MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
+
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) =>
+            ViewModel.SelectedMessage = e.NewValue as MessageViewModel;
+
+        private void SelectTypedMessage(IEnumerable<ProtoType> messages)
         {
-            (this.DataContext as MainWindowViewModel)!.SelectedMessage = e.NewValue as MessageViewModel;
+            var itemContainer = tv_TypedMessages.ItemContainerGenerator;
+            var enumerator = messages.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var message = enumerator.Current;
+                if (itemContainer.Status is GeneratorStatus.ContainersGenerated)
+                {
+                    itemContainer = ExpandMessage(itemContainer, message);
+                }
+                else
+                {
+                    Dispatcher.Invoke(delegate
+                    {
+                        itemContainer = ExpandMessage(itemContainer, message);
+                    }, DispatcherPriority.Input);
+                }
+            }
+
+            static ItemContainerGenerator ExpandMessage(ItemContainerGenerator itemContainer, ProtoType message)
+            {
+                var tvi = itemContainer.ContainerFromItem(message) as TreeViewItem;
+                if (tvi == null && itemContainer.Items.OfType<TypedField>().FirstOrDefault(x => x.Value == message) is { } typedField)
+                {
+                    tvi = itemContainer.ContainerFromItem(typedField) as TreeViewItem;
+                }
+                if (tvi != null)
+                {
+                    tvi.IsExpanded = true;
+                    tvi.IsSelected = true;
+                    tvi.BringIntoView();
+                    itemContainer = tvi.ItemContainerGenerator;
+                }
+
+                return itemContainer;
+            }
         }
     }
 }
