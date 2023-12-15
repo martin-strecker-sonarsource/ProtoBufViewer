@@ -57,7 +57,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto" MinWidth="120"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button
@@ -72,7 +72,10 @@
                     Content="Open encoded proto"
                     Command="{Binding Path=OpenBinaryCommand}"
                     Margin="5" />
-            <TextBox Grid.Column="2" Text="{Binding SearchText, Delay=300}" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Target="{Binding ElementName=tb_Search}">Search</Label>
+                <TextBox x:Name="tb_Search" Text="{Binding SearchText, Delay=300, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center" MinWidth="120"/>
+            </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
