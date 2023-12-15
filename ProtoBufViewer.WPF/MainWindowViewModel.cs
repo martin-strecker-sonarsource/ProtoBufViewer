@@ -180,9 +180,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
             var current = stack.Peek();
             switch (current)
             {
-                case TypedString s when s.Value.Contains(searchText): return true;
+                case TypedString s when s.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase): return true;
                 case TypedBool b when searchText.Equals("true", StringComparison.OrdinalIgnoreCase) && b.Value: return true;
                 case TypedBool b when searchText.Equals("false", StringComparison.OrdinalIgnoreCase) && !b.Value: return true;
+                case TypedEnum e when e.EnumValue?.Contains(searchText) == true: return true;
                 case TypedUnknown u when u.Value is string s && s.Contains(searchText): return true;
                 case TypedMessage m:
                     foreach (var f in m.Fields)

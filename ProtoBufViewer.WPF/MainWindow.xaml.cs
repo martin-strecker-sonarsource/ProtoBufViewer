@@ -29,6 +29,11 @@ namespace ProtoBufViewer.WPF
             var enumerator = messages.GetEnumerator();
             while (enumerator.MoveNext())
             {
+                if (itemContainer == null)
+                {
+                    return;
+                }
+
                 var message = enumerator.Current;
                 if (itemContainer.Status is GeneratorStatus.ContainersGenerated)
                 {
@@ -52,8 +57,7 @@ namespace ProtoBufViewer.WPF
                 }
                 if (tvi != null)
                 {
-                    tvi.IsExpanded = true;
-                    tvi.IsSelected = true;
+                    (tvi.IsExpanded, tvi.IsSelected) = (true, true);
                     tvi.BringIntoView();
                     itemContainer = tvi.ItemContainerGenerator;
                 }
