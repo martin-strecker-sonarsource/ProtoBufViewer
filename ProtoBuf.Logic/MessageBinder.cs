@@ -34,7 +34,7 @@ namespace ProtoBuf.Logic
             {
                 var (index, type) = input.ReadWireTag();
                 var field = messageDef?.messageBody().messageElement().Select(x => x.field()).Where(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index).FirstOrDefault();
-                var parsedFields = messageDef != null && field != null && FitsFieldType(type, field.type_()) is var fieldType and not FieldType.Unknown 
+                var parsedFields = messageDef != null && field != null && FitsFieldType(type, field.type_()) is var fieldType and not FieldType.Unknown
                     ? ParseField(input, protoContext, fieldType, field)
                     : ParseUnknownField(input, new WireTag(index, type));
                 fields.AddRange(parsedFields);
@@ -67,16 +67,22 @@ namespace ProtoBuf.Logic
                 var expectedEnd = stream.Position + length;
                 while (stream.Position < expectedEnd)
                 {
-                    yield return ReadExpectedType(stream, protoContext, expectedType);
+                    if (ReadExpectedType(stream, protoContext, expectedType) is { } protoType)
+                    {
+                        yield return protoType;
+                    }
                 }
             }
             else
             {
-                yield return ReadExpectedType(stream, protoContext, expectedType);
+                if (ReadExpectedType(stream, protoContext, expectedType) is { } protoType)
+                {
+                    yield return protoType;
+                }
             }
         }
 
-        private static ProtoType ReadExpectedType(CodedInputStream stream, ProtoContext protoContext, Type_Context expectedType)
+        private static ProtoType? ReadExpectedType(CodedInputStream stream, ProtoContext protoContext, Type_Context expectedType)
         {
             if (expectedType.INT32() is not null)
                 return new TypedInt32(stream.ReadInt32());
