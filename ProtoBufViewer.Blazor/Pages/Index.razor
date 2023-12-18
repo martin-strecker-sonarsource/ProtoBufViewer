@@ -33,7 +33,18 @@
         </MudFileUpload>
         <MudTreeView T="MessageViewModel" Items="Messages" Context="message" @bind-SelectedValue="SelectedMessage">
             <ItemTemplate>
-                <MudTreeViewItem Items="@message.Nested" Text="@message.Name" Value="@message" />
+                <MudTreeViewItem Items="@message.Nested" Value="@message">
+                    <BodyContent>
+                        <MudTooltip ShowOnHover="@true" Delay="1000" Placement="Placement.End">
+                            <ChildContent>
+                                <MudText>@message.Name</MudText>
+                                </ChildContent>
+                                <TooltipContent>
+                                    <MudText><pre style="text-align:left">@message.Definition</pre></MudText>
+                            </TooltipContent>
+                        </MudTooltip>
+                    </BodyContent>
+                </MudTreeViewItem>
             </ItemTemplate>
         </MudTreeView>
     </MudItem>
@@ -83,10 +94,16 @@
                         {
                             <MudTreeViewItem T="ProtoType" Items="@fieldMessage.Fields.Select(x => (ProtoType)x).ToHashSet()" Context="messageField">
                                 <BodyContent>
-                                    <MudText><b>@field.Name:&nbsp;</b></MudText>
-                                    <MudText>@fieldMessage.MessageType</MudText>
-                                    </BodyContent>
-                                </MudTreeViewItem>
+                                    <MudTooltip ShowOnHover="@true" Delay="1000" Placement="Placement.Top">
+                                        <ChildContent>
+                                            <MudText><b>@field.Name:&nbsp;</b>@fieldMessage.MessageType</MudText>
+                                            </ChildContent>
+                                            <TooltipContent>
+                                                <MudText><pre style="text-align:left">@fieldMessage.Definition</pre></MudText>
+                                        </TooltipContent>
+                                    </MudTooltip>
+                                </BodyContent>
+                            </MudTreeViewItem>
                         }
                         else
                         {
@@ -153,6 +170,10 @@
                                         case TypedUnknown x:
                                             <MudText><b>@field.Name:&nbsp;</b></MudText>
                                             <MudText>@x.Value</MudText>
+                                            break;
+                                        case TypedEnum x:
+                                            <MudText><b>@field.Name:&nbsp;</b></MudText>
+                                            <MudText>@x.EnumValue</MudText>
                                             break;
                                     }
                                 </BodyContent>
