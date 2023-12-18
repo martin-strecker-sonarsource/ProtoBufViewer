@@ -11,11 +11,24 @@
     <MudItem xs="12" sm="4">
         <MudFileUpload T="IBrowserFile" Accept="*.proto" FilesChanged="MessageFileChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
             <ButtonTemplate>
-                <MudPaper Height="300px" Outlined="true" Class="@DefaultDragClass">
-                    <MudText Typo="Typo.h6">
-                        Drag and drop the proto definition file here or click
-                    </MudText>
-                </MudPaper>
+                @if (ProtoFile == null)
+                {
+                    <MudPaper Height="300px" Outlined="true" Class="@DefaultDragClass">
+                        <MudText Typo="Typo.h6">
+                            Drag and drop the proto definition file here or click
+                        </MudText>
+                    </MudPaper>
+                }
+                else
+                {
+                    <MudButton HtmlTag="label"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.CloudUpload"
+                               for="@context.Id">
+                        Change '@ProtoFile.Name' definition file
+                    </MudButton>
+                }
             </ButtonTemplate>
         </MudFileUpload>
         <MudTreeView T="MessageViewModel" Items="Messages" Context="message" @bind-SelectedValue="SelectedMessage">
@@ -25,15 +38,39 @@
         </MudTreeView>
     </MudItem>
     <MudItem xs="12" sm="8">
-        <MudFileUpload T="IBrowserFile" FilesChanged="BinFilesChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
-            <ButtonTemplate>
-                <MudPaper Height="300px" Outlined="true" Class="@DefaultDragClass">
-                    <MudText Typo="Typo.h6">
-                        Drag and drop the binary proto file here or click
-                    </MudText>
-                </MudPaper>
-            </ButtonTemplate>
-        </MudFileUpload>
+        @if (SelectedMessage == null)
+        {
+            @if (ProtoFile != null)
+            {
+                <MudAlert Severity="Severity.Info" Style="margin-top: 10pt;">Select the root message type of the binary proto file</MudAlert>
+            }
+        }
+        else
+        {
+            <MudFileUpload T="IBrowserFile" FilesChanged="BinFilesChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
+                <ButtonTemplate>
+                    @if (ProtoBinFile == null)
+                    {
+                        <MudPaper Height="300px" Outlined="true" Class="@DefaultDragClass">
+                            <MudText Typo="Typo.h6">
+                                Drag and drop the binary proto file with root message <code>@SelectedMessage.Name</code> here or click
+                            </MudText>
+                        </MudPaper>
+                    }
+                    else
+                    {
+                        <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                                   for="@context.Id">
+                            Change '@ProtoBinFile.Name' binary proto file
+                        </MudButton>
+                    }
+                </ButtonTemplate>
+            </MudFileUpload>
+        }
+
         <MudTreeView T="ProtoType" Items="TypedMessages" Context="typedValue">
             <ItemTemplate>
                 @switch (typedValue)
@@ -133,6 +170,8 @@
 @code
 {
     private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
+    private IBrowserFile? ProtoFile;
+    private IBrowserFile? ProtoBinFile;
     HashSet<MessageViewModel> Messages { get; } = new();
     MessageViewModel? SelectedMessage { get; set; }
     ProtoContext? ParseResult { get; set; }
@@ -141,6 +180,8 @@
 
     private async Task MessageFileChanged(IBrowserFile file)
     {
+        ProtoFile = file;
+        Messages.Clear();
         using var ms = new MemoryStream();
         await file.OpenReadStream().CopyToAsync(ms);
         ms.Position = 0;
@@ -155,6 +196,7 @@
 
     private async Task BinFilesChanged(IBrowserFile file)
     {
+        ProtoBinFile = file;
         using var ms = new MemoryStream();
         await file.OpenReadStream().CopyToAsync(ms);
         ms.Position = 0;
