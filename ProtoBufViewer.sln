@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBufTests", "ProtoBufTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBuf.Logic", "ProtoBuf.Logic\ProtoBuf.Logic.csproj", "{1D8BCAEE-DEC3-4A19-9FBC-A82527EFF3B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoBufViewer.WPF", "ProtoBufViewer.WPF\ProtoBufViewer.WPF.csproj", "{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBufViewer.WPF", "ProtoBufViewer.WPF\ProtoBufViewer.WPF.csproj", "{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBufViewer.Blazor", "ProtoBufViewer.Blazor\ProtoBufViewer.Blazor.csproj", "{86ABFD43-8587-4313-B176-C5E9AAA5840C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0A6E631-78DC-47D3-97CA-1D152B9DCFB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86ABFD43-8587-4313-B176-C5E9AAA5840C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86ABFD43-8587-4313-B176-C5E9AAA5840C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86ABFD43-8587-4313-B176-C5E9AAA5840C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86ABFD43-8587-4313-B176-C5E9AAA5840C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
