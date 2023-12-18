@@ -51,7 +51,7 @@ namespace ProtoBuf.Logic
         }
     }
 
-    public sealed record class TypedField(string Name, int Index, ProtoType Value);
+    public sealed record class TypedField(string Name, int Index, ProtoType Value): ProtoType(Value.Type);
 
     public class TypedMessageDecoder
     {

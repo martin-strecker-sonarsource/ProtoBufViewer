@@ -7,9 +7,9 @@ namespace ProtoBuf.Logic
 {
     public record class MessageViewModel(Protobuf3Parser.MessageDefContext MessageDefContext, string Name, MessageViewModel? Parent)
     {
-        private readonly List<MessageViewModel> nested = new();
+        private readonly HashSet<MessageViewModel> nested = new();
         private readonly List<FieldViewModel> fields = new();
-        public IReadOnlyCollection<MessageViewModel> Nested { get => nested; }
+        public HashSet<MessageViewModel> Nested { get => nested; }
         public IReadOnlyCollection<FieldViewModel> Fields { get => fields; }
 
         public string Definition => GetFullText(MessageDefContext);

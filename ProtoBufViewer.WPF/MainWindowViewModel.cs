@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Google.Protobuf;
-using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
 using ProtoBuf.Logic;
 using System.Collections.ObjectModel;
@@ -24,11 +23,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
         OpenBinaryCommand = new RelayCommand(OpenBinary, () => SelectedMessage != null);
         Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
         {
-            ProtoFile = new(Settings.Default.ProtoFile ?? SpecialDirectories.MyDocuments);
-            SelectedMessage = Messages.FirstOrDefault(x => x.Name == Settings.Default.SelectedMessage);
-            if (SelectedMessage != null && Settings.Default.ProtoBinFile is { } binFile)
+            if (!string.IsNullOrWhiteSpace(Settings.Default.ProtoFile))
             {
-                ProtoBinFile = new(binFile);
+                ProtoFile = new(Settings.Default.ProtoFile);
+                SelectedMessage = Messages.FirstOrDefault(x => x.Name == Settings.Default.SelectedMessage);
+                if (SelectedMessage != null && Settings.Default.ProtoBinFile is { } binFile)
+                {
+                    ProtoBinFile = new(binFile);
+                }
             }
         }));
     }
@@ -38,7 +40,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public RelayCommand OpenProtoCommand { get; }
     public RelayCommand OpenBinaryCommand { get; }
 
-    public ObservableCollection<MessageViewModel> Messages { get; } = new();
+    public ObservableCollection<MessageViewModel> Messages { get; } = [];
     public MessageViewModel? SelectedMessage
     {
         get => selectedMessage;
@@ -56,12 +58,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
 
     private IReadOnlyCollection<TypedMessage>? typedMessages;
-    private string searchText;
+    private string? searchText;
 
     public IReadOnlyCollection<TypedMessage>? TypedMessages { get => typedMessages; set { typedMessages = value; OnPropertyChanged(); } }
-    public FileInfo ProtoFile
+    public FileInfo? ProtoFile
     {
-        get => new(Settings.Default.ProtoFile);
+        get => string.IsNullOrWhiteSpace(Settings.Default.ProtoFile) ? null : new(Settings.Default.ProtoFile);
         set
         {
             Settings.Default.ProtoFile = value?.FullName;
@@ -70,9 +72,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
             ParseProto();
         }
     }
-    public FileInfo ProtoBinFile
+    public FileInfo? ProtoBinFile
     {
-        get => new(Settings.Default.ProtoBinFile);
+        get => string.IsNullOrWhiteSpace(Settings.Default.ProtoBinFile) ? null : new(Settings.Default.ProtoBinFile);
         set
         {
             Settings.Default.ProtoBinFile = value?.FullName;
@@ -82,12 +84,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public Action<IEnumerable<ProtoType>> SelectTypedMessage { get; internal set; }
+    public Action<IEnumerable<ProtoType>>? SelectTypedMessage { get; internal set; }
 
     private void OpenProto()
     {
-        OpenFileDialog openFileDialog = new();
-        openFileDialog.Filter = "ProtoBuf Files (*.proto)|*.proto";
+        OpenFileDialog openFileDialog = new()
+        {
+            Filter = "ProtoBuf Files (*.proto)|*.proto"
+        };
         if (openFileDialog.ShowDialog() is true)
         {
             ProtoFile = new(openFileDialog.FileName);
@@ -123,8 +127,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
             return;
         }
 
-        OpenFileDialog openFileDialog = new();
-        openFileDialog.Filter = "ProtoBuf Binary Files (*.pb)|*.pb";
+        OpenFileDialog openFileDialog = new()
+        {
+            Filter = "ProtoBuf Binary Files (*.pb)|*.pb"
+        };
         if (openFileDialog.ShowDialog() is true)
         {
             ProtoBinFile = new(openFileDialog.FileName);
@@ -136,12 +142,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
         TypedMessages = null;
         try
         {
-            if (ProtoBinFile is { Exists: true, FullName: { } file })
+            if (ProtoBinFile is { Exists: true, FullName: { } file }
+                && ParseResult is { } protoContext
+                && SelectedMessage is { MessageDefContext: { } messageDefContext })
             {
                 using var fs = new FileStream(file, FileMode.Open, FileAccess.Read);
                 using var coded = CodedInputStream.CreateWithLimits(fs, int.MaxValue, int.MaxValue);
                 var decoder = new TypedMessageDecoder();
-                TypedMessages = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
+                TypedMessages = decoder.Parse(coded, protoContext, messageDefContext);
             }
         }
         catch (Exception ex)
@@ -150,7 +158,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public string SearchText
+    public string? SearchText
     {
         get => searchText;
         set
@@ -164,12 +172,16 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private void DoSearch()
     {
         var stack = new Stack<ProtoType>();
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            return;
+        }
         foreach (var m in TypedMessages ?? Enumerable.Empty<TypedMessage>())
         {
             stack.Push(m);
             if (FindMessage(stack, SearchText))
             {
-                SelectTypedMessage(stack.Reverse());
+                SelectTypedMessage?.Invoke(stack.Reverse());
                 return;
             }
             stack.Pop();
