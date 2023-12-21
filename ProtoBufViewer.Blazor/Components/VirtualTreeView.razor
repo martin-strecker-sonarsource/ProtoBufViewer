@@ -1,0 +1,101 @@
+﻿@inherits ComponentBase
+@typeparam T
+
+
+<ul style="flex-shrink:0">
+    <Virtualize Items="viewList" ItemSize="50" Context="viewListItem">
+        <li @key="@viewListItem" style="height:50px; flex-shrink:0; margin-left:@(viewListItem.level * 48)pt;">
+            @if (ChildrenSelector?.Invoke(viewListItem.item)?.Count > 0)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronRight" OnClick="() => OnClick(viewListItem)" />
+            }
+            @if (ItemTemplate == null)
+            {
+                @viewListItem.item
+            }
+            else
+            {
+                @ItemTemplate(viewListItem.item)
+            }
+        </li>
+    </Virtualize>
+</ul>
+
+
+@code {
+    [Parameter]
+    public RenderFragment<T>? ItemTemplate { get; set; }
+
+    [Parameter]
+    public IReadOnlyCollection<T>? Items { get; set; }
+
+    [Parameter]
+    public Func<T, IReadOnlyCollection<T>>? ChildrenSelector { get; set; }
+
+
+    private List<(T item, bool isExpanded, int level)> viewList = new();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        SynchronizeViewList();
+    }
+
+    private void SynchronizeViewList()
+    {
+        if (Items is { } items)
+        {
+            viewList.Clear();
+            viewList.AddRange(items.Select(x => (x, false, 0)));
+        }
+    }
+
+    private void OnClick((T item, bool isExpanded, int level) item)
+    {
+        var current = Items;
+        var viewListIndex = 0;
+        IterateCurrent(Items ?? []);
+
+        bool IterateCurrent(IReadOnlyCollection<T> current)
+        {
+            foreach (var currentItem in current)
+            {
+                var currentViewItem = viewList[viewListIndex];
+                if (!EqualityComparer<T>.Default.Equals(currentItem, currentViewItem.item))
+                {
+                    SynchronizeViewList();
+                    return false;
+                }
+                else if (EqualityComparer<T>.Default.Equals(currentItem, item.item))
+                {
+                    var newIsExpanded = !item.isExpanded;
+                    viewList[viewListIndex] = item with { isExpanded = newIsExpanded };
+                    var children = ChildrenSelector?.Invoke(currentItem) ?? [];
+                    if (newIsExpanded)
+                    {
+                        viewList.InsertRange(viewListIndex + 1, children.Select(x => (x, false, item.level + 1)));
+                    }
+                    else
+                    {
+                        viewList.RemoveRange(viewListIndex +1, children.Count);
+                    }
+                    return false;
+                }
+                else
+                {
+                    viewListIndex++;
+                    if (currentViewItem.isExpanded)
+                    {
+                        var children = ChildrenSelector?.Invoke(currentItem) ?? [];
+                        var doContinue = IterateCurrent(children);
+                        if (!doContinue)
+                        {
+                            return doContinue;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
+}

@@ -81,8 +81,75 @@
                 </ButtonTemplate>
             </MudFileUpload>
         }
-
-        <MudTreeView T="ProtoType" Items="TypedMessages" Context="typedValue">
+        <VirtualTreeView T="ProtoType" Items="TypedMessages" ChildrenSelector="x => x switch {
+            TypedMessage message => message.Fields,
+            TypedField { Value: TypedMessage message } => message.Fields,
+            _ => []
+            }">
+            <ItemTemplate>
+                @switch (context)
+                {
+                    case TypedMessage message:
+                        @message.MessageType
+                        break;
+                    case TypedField field:
+                        <b>@field.Name:&nbsp;</b>
+                        @switch (field.Value)
+                        {
+                            case TypedFloat x:
+                                @x.Value
+                                break;
+                            case TypedInt32 x:
+                                @x.Value
+                                break;
+                            case TypedInt64 x:
+                                @x.Value
+                                break;
+                            case TypedUint32 x:
+                                @x.Value
+                                break;
+                            case TypedUint64 x:
+                                @x.Value
+                                break;
+                            case TypedSint32 x:
+                                @x.Value
+                                break;
+                            case TypedSint64 x:
+                                @x.Value
+                                break;
+                            case TypedFixed32 x:
+                                @x.Value
+                                break;
+                            case TypedFixed64 x:
+                                @x.Value
+                                break;
+                            case TypedSfixed32 x:
+                                @x.Value
+                                break;
+                            case TypedSfixed64 x:
+                                @x.Value
+                                break;
+                            case TypedBool x:
+                                @x.Value
+                                break;
+                            case TypedString x:
+                                @x.Value
+                                break;
+                            case TypedBytes x:
+                                @x.Value
+                                break;
+                            case TypedUnknown x:
+                                @x.Value
+                                break;
+                            case TypedEnum x:
+                                @x.EnumValue
+                                break;
+                        }
+                        break;
+                }
+            </ItemTemplate>
+        </VirtualTreeView>
+        <MudTreeView T="ProtoType" Context="typedValue">
             <ItemTemplate>
                 @switch (typedValue)
                 {
