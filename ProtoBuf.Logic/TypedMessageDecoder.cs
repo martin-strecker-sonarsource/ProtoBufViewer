@@ -1,27 +1,31 @@
-﻿using Antlr4.Runtime.Misc;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Google.Protobuf;
 using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBuf.Logic
 {
-    public abstract record class ProtoType(string Type);
-    public sealed record class TypedDouble(double Value) : ProtoType("Double");
-    public sealed record class TypedFloat(float Value) : ProtoType("Float");
-    public sealed record class TypedInt32(Int32 Value) : ProtoType("Int32");
-    public sealed record class TypedInt64(Int64 Value) : ProtoType("Int64");
-    public sealed record class TypedUint32(UInt32 Value) : ProtoType("UInt32");
-    public sealed record class TypedUint64(UInt64 Value) : ProtoType("UInt64");
-    public sealed record class TypedSint32(Int32 Value) : ProtoType("SInt32");
-    public sealed record class TypedSint64(Int64 Value) : ProtoType("SInt64");
-    public sealed record class TypedFixed32(UInt32 Value) : ProtoType("Fixed32");
-    public sealed record class TypedFixed64(UInt64 Value) : ProtoType("Fixed64");
-    public sealed record class TypedSfixed32(Int32 Value) : ProtoType("Sfixed32");
-    public sealed record class TypedSfixed64(Int64 Value) : ProtoType("Sfixed64");
-    public sealed record class TypedBool(bool Value) : ProtoType("Bool");
-    public sealed record class TypedString(string Value) : ProtoType("String");
-    public sealed record class TypedBytes(ByteString Value) : ProtoType("Bytes");
-    public sealed record class TypedUnknown(object Value) : ProtoType("Unknown");
-    public sealed record class TypedMessage(IReadOnlyList<TypedField> Fields, MessageDefContext? MessageDef) : ProtoType("Message")
+    public abstract record class ProtoType(string Type, ParserRuleContext? TypeDefinition)
+    {
+        public string Definition => TypeDefinition?.GetFullText() ?? "No definition";
+    }
+    public sealed record class TypedDouble(double Value, ParserRuleContext? TypeDefinition) : ProtoType("Double", TypeDefinition);
+    public sealed record class TypedFloat(float Value, ParserRuleContext? TypeDefinition) : ProtoType("Float", TypeDefinition);
+    public sealed record class TypedInt32(Int32 Value, ParserRuleContext? TypeDefinition) : ProtoType("Int32", TypeDefinition);
+    public sealed record class TypedInt64(Int64 Value, ParserRuleContext? TypeDefinition) : ProtoType("Int64", TypeDefinition);
+    public sealed record class TypedUint32(UInt32 Value, ParserRuleContext? TypeDefinition) : ProtoType("UInt32", TypeDefinition);
+    public sealed record class TypedUint64(UInt64 Value, ParserRuleContext? TypeDefinition) : ProtoType("UInt64", TypeDefinition);
+    public sealed record class TypedSint32(Int32 Value, ParserRuleContext? TypeDefinition) : ProtoType("SInt32", TypeDefinition);
+    public sealed record class TypedSint64(Int64 Value, ParserRuleContext? TypeDefinition) : ProtoType("SInt64", TypeDefinition);
+    public sealed record class TypedFixed32(UInt32 Value, ParserRuleContext? TypeDefinition) : ProtoType("Fixed32", TypeDefinition);
+    public sealed record class TypedFixed64(UInt64 Value, ParserRuleContext? TypeDefinition) : ProtoType("Fixed64", TypeDefinition);
+    public sealed record class TypedSfixed32(Int32 Value, ParserRuleContext? TypeDefinition) : ProtoType("Sfixed32", TypeDefinition);
+    public sealed record class TypedSfixed64(Int64 Value, ParserRuleContext? TypeDefinition) : ProtoType("Sfixed64", TypeDefinition);
+    public sealed record class TypedBool(bool Value, ParserRuleContext? TypeDefinition) : ProtoType("Bool", TypeDefinition);
+    public sealed record class TypedString(string Value, ParserRuleContext? TypeDefinition) : ProtoType("String", TypeDefinition);
+    public sealed record class TypedBytes(ByteString Value, ParserRuleContext? TypeDefinition) : ProtoType("Bytes", TypeDefinition);
+    public sealed record class TypedUnknown(object Value) : ProtoType("Unknown", null);
+    public sealed record class TypedMessage(IReadOnlyList<TypedField> Fields, ParserRuleContext? TypeDefinition, MessageDefContext? MessageDef) : ProtoType("Message", TypeDefinition)
     {
         public string MessageType => MessageDef == null ? "Unknown message type" : MessageDef.messageName().GetText();
 
@@ -35,7 +39,7 @@ namespace ProtoBuf.Logic
             return context.Start.InputStream.GetText(Interval.Of(context.Start.StartIndex, context.Stop.StopIndex));
         }
     }
-    public sealed record class TypedEnum(int Value, EnumDefContext? EnumDef) : ProtoType("Enum")
+    public sealed record class TypedEnum(int Value, ParserRuleContext? TypeDefinition, EnumDefContext? EnumDef) : ProtoType("Enum", TypeDefinition)
     {
         public string EnumType => EnumDef == null ? "Unknown enum type" : EnumDef.enumName().GetText();
         public string EnumValue => EnumDef?.enumBody().enumElement().FirstOrDefault(
@@ -51,7 +55,7 @@ namespace ProtoBuf.Logic
         }
     }
 
-    public sealed record class TypedField(string Name, int Index, ProtoType Value): ProtoType(Value.Type);
+    public sealed record class TypedField(string Name, int Index, ParserRuleContext? TypeDefinition, ProtoType Value): ProtoType(Value.Type, TypeDefinition);
 
     public class TypedMessageDecoder
     {

@@ -93,187 +93,84 @@
                         @message.MessageType
                         break;
                     case TypedField field:
-                        <b>@field.Name:&nbsp;</b>
-                        @switch (field.Value)
-                        {
-                            case TypedFloat x:
-                                @x.Value
-                                break;
-                            case TypedInt32 x:
-                                @x.Value
-                                break;
-                            case TypedInt64 x:
-                                @x.Value
-                                break;
-                            case TypedUint32 x:
-                                @x.Value
-                                break;
-                            case TypedUint64 x:
-                                @x.Value
-                                break;
-                            case TypedSint32 x:
-                                @x.Value
-                                break;
-                            case TypedSint64 x:
-                                @x.Value
-                                break;
-                            case TypedFixed32 x:
-                                @x.Value
-                                break;
-                            case TypedFixed64 x:
-                                @x.Value
-                                break;
-                            case TypedSfixed32 x:
-                                @x.Value
-                                break;
-                            case TypedSfixed64 x:
-                                @x.Value
-                                break;
-                            case TypedBool x:
-                                @x.Value
-                                break;
-                            case TypedString x:
-                                @x.Value
-                                break;
-                            case TypedBytes x:
-                                @x.Value
-                                break;
-                            case TypedUnknown x:
-                                @x.Value
-                                break;
-                            case TypedEnum x:
-                                @x.EnumValue
-                                break;
-                        }
+                        <MudTooltip>
+                            <ChildContent>
+                                <b>@field.Name:&nbsp;</b>
+                                @switch (field.Value)
+                                {
+                                    case TypedFloat x:
+                                        @x.Value
+                                        break;
+                                    case TypedInt32 x:
+                                        @x.Value
+                                        break;
+                                    case TypedInt64 x:
+                                        @x.Value
+                                        break;
+                                    case TypedUint32 x:
+                                        @x.Value
+                                        break;
+                                    case TypedUint64 x:
+                                        @x.Value
+                                        break;
+                                    case TypedSint32 x:
+                                        @x.Value
+                                        break;
+                                    case TypedSint64 x:
+                                        @x.Value
+                                        break;
+                                    case TypedFixed32 x:
+                                        @x.Value
+                                        break;
+                                    case TypedFixed64 x:
+                                        @x.Value
+                                        break;
+                                    case TypedSfixed32 x:
+                                        @x.Value
+                                        break;
+                                    case TypedSfixed64 x:
+                                        @x.Value
+                                        break;
+                                    case TypedBool x:
+                                        @x.Value
+                                        break;
+                                    case TypedString x:
+                                        @x.Value
+                                        break;
+                                    case TypedBytes x:
+                                        @x.Value
+                                        break;
+                                    case TypedUnknown x:
+                                        @x.Value
+                                        break;
+                                    case TypedEnum x:
+                                        @x.EnumValue
+                                        break;
+                                    case TypedMessage x:
+                                        <MudTooltip Placement="Placement.Top" Arrow="true">
+                                            <ChildContent>
+                                                @x.MessageType
+                                            </ChildContent>
+                                            <TooltipContent>
+                                                <MudText><pre style="text-align:left">@x.Definition</pre></MudText>
+                                            </TooltipContent>
+                                        </MudTooltip>
+                                        break;
+                                }
+                            </ChildContent>
+                            <TooltipContent>
+                                <MudText><pre style="text-align:left">@field.Definition</pre></MudText>
+                            </TooltipContent>
+                        </MudTooltip>
+
                         break;
                 }
             </ItemTemplate>
         </VirtualTreeView>
-        <MudTreeView T="ProtoType" Context="typedValue">
-            <ItemTemplate>
-                @switch (typedValue)
-                {
-                    case TypedMessage message:
-                        <MudTreeViewItem T="ProtoType" Items="@message.Fields.Select(x => (ProtoType)x).ToHashSet()" Text="@message.MessageType" />
-                        break;
-                    case TypedField field:
-                        @if (field.Value is TypedMessage fieldMessage)
-                        {
-                            <MudTreeViewItem T="ProtoType" Items="@fieldMessage.Fields.Select(x => (ProtoType)x).ToHashSet()" Context="messageField">
-                                <BodyContent>
-                                    <MudTooltip ShowOnHover="@true" Delay="1000" Placement="Placement.Top">
-                                        <ChildContent>
-                                            <MudText><b>@field.Name:&nbsp;</b>@fieldMessage.MessageType</MudText>
-                                            </ChildContent>
-                                            <TooltipContent>
-                                                <MudText><pre style="text-align:left">@fieldMessage.Definition</pre></MudText>
-                                        </TooltipContent>
-                                    </MudTooltip>
-                                </BodyContent>
-                            </MudTreeViewItem>
-                        }
-                        else
-                        {
-                            <MudTreeViewItem T="ProtoType">
-                                <BodyContent>
-                                    <MudText><b>@field.Name:&nbsp;</b></MudText>
-                                    @switch (field.Value)
-                                    {
-                                        case TypedFloat x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedInt32 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedInt64 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedUint32 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedUint64 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedSint32 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedSint64 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedFixed32 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedFixed64 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedSfixed32 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedSfixed64 x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedBool x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedString x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedBytes x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedUnknown x:
-                                            <MudText>@x.Value</MudText>
-                                            break;
-                                        case TypedEnum x:
-                                            <MudText>@x.EnumValue</MudText>
-                                            break;
-                                    }
-                                </BodyContent>
-                            </MudTreeViewItem>
-                        }
-                        break;
-                }
-            </ItemTemplate>
-        </MudTreeView>
     </MudItem>
 </MudGrid>
 
 @code
 {
-    private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
-    private IBrowserFile? ProtoFile;
-    private IBrowserFile? ProtoBinFile;
-    HashSet<MessageViewModel> Messages { get; } = new();
-    MessageViewModel? SelectedMessage { get; set; }
-    ProtoContext? ParseResult { get; set; }
 
-    HashSet<ProtoType>? TypedMessages { get; set; }
-
-    private async Task MessageFileChanged(IBrowserFile file)
-    {
-        ProtoFile = file;
-        Messages.Clear();
-        using var ms = new MemoryStream();
-        await file.OpenReadStream().CopyToAsync(ms);
-        ms.Position = 0;
-        ParseResult = ProtoParser.ParseFile(ms);
-        var visitor = new MessageViewModel.Visitor();
-        visitor.Visit(ParseResult);
-        foreach (var m in visitor.Messages.Where(x => x.Parent == null))
-        {
-            Messages.Add(m);
-        }
-    }
-
-    private async Task BinFilesChanged(IBrowserFile file)
-    {
-        ProtoBinFile = file;
-        using var ms = new MemoryStream();
-        await file.OpenReadStream().CopyToAsync(ms);
-        ms.Position = 0;
-        using var coded = CodedInputStream.CreateWithLimits(ms, int.MaxValue, int.MaxValue);
-        var decoder = new TypedMessageDecoder();
-        var result = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
-        TypedMessages = new(result);
-    }
 }

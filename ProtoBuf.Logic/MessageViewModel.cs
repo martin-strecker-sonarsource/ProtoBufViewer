@@ -12,15 +12,7 @@ namespace ProtoBuf.Logic
         public HashSet<MessageViewModel> Nested { get => nested; }
         public IReadOnlyCollection<FieldViewModel> Fields { get => fields; }
 
-        public string Definition => GetFullText(MessageDefContext);
-
-        public static string GetFullText(ParserRuleContext context)
-        {
-            if (context.Start == null || context.Stop == null || context.Start.StartIndex < 0 || context.Stop.StopIndex < 0)
-                return context.GetText(); // Fallback
-
-            return context.Start.InputStream.GetText(Interval.Of(context.Start.StartIndex, context.Stop.StopIndex));
-        }
+        public string Definition => MessageDefContext.GetFullText();
 
         public class Visitor : Protobuf3BaseVisitor<bool>
         {

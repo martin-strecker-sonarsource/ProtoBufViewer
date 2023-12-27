@@ -32,14 +32,14 @@ namespace ProtoBuf.Logic
                     : ParseUnknownField(input, new WireTag(index, type));
                 fields.AddRange(parsedFields);
             }
-            Result = new TypedMessage(fields, messageDef);
+            Result = new TypedMessage(fields, messageDef, messageDef);
         }
 
         private IEnumerable<TypedField> ParseUnknownField(CodedInputStream stream, WireTag wireTag)
         {
             var (index, type) = wireTag;
             var value = stream.ReadType(type);
-            yield return new TypedField("Unknown", index, new TypedUnknown(value));
+            yield return new TypedField("Unknown", index, null, new TypedUnknown(value));
         }
 
         private IEnumerable<TypedField> ParseField(CodedInputStream stream, ProtoContext protoContext, FieldType type, FieldContext field)
@@ -48,7 +48,7 @@ namespace ProtoBuf.Logic
             var values = ReadExpectedType(stream, protoContext, type, field.type_());
             foreach (var value in values)
             {
-                yield return new TypedField(fieldName, index, value);
+                yield return new TypedField(fieldName, index, field, value);
             }
         }
 
@@ -78,38 +78,38 @@ namespace ProtoBuf.Logic
         private static ProtoType? ReadExpectedType(CodedInputStream stream, ProtoContext protoContext, Type_Context expectedType)
         {
             if (expectedType.INT32() is not null)
-                return new TypedInt32(stream.ReadInt32());
+                return new TypedInt32(stream.ReadInt32(), expectedType);
             else if (expectedType.INT64() is not null)
-                return new TypedInt64(stream.ReadInt64());
+                return new TypedInt64(stream.ReadInt64(), expectedType);
             else if (expectedType.SINT32() is not null)
-                return new TypedSint32(stream.ReadSInt32());
+                return new TypedSint32(stream.ReadSInt32(), expectedType);
             else if (expectedType.SINT64() is not null)
-                return new TypedSint64(stream.ReadSInt64());
+                return new TypedSint64(stream.ReadSInt64(), expectedType);
             else if (expectedType.UINT32() is not null)
-                return new TypedUint32(stream.ReadUInt32());
+                return new TypedUint32(stream.ReadUInt32(), expectedType);
             else if (expectedType.UINT64() is not null)
-                return new TypedUint64(stream.ReadUInt64());
+                return new TypedUint64(stream.ReadUInt64(), expectedType);
             else if (expectedType.BOOL() is not null)
-                return new TypedBool(stream.ReadBool());
+                return new TypedBool(stream.ReadBool(), expectedType);
             else if (expectedType.FIXED32() is not null)
-                return new TypedFixed32(stream.ReadFixed32());
+                return new TypedFixed32(stream.ReadFixed32(), expectedType);
             else if (expectedType.FIXED64() is not null)
-                return new TypedFixed64(stream.ReadFixed64());
+                return new TypedFixed64(stream.ReadFixed64(), expectedType);
             else if (expectedType.SFIXED32() is not null)
-                return new TypedSfixed32(stream.ReadSFixed32());
+                return new TypedSfixed32(stream.ReadSFixed32(), expectedType);
             else if (expectedType.SFIXED64() is not null)
-                return new TypedSfixed64(stream.ReadSFixed64());
+                return new TypedSfixed64(stream.ReadSFixed64(), expectedType);
             else if (expectedType.DOUBLE() is not null)
-                return new TypedDouble(stream.ReadDouble());
+                return new TypedDouble(stream.ReadDouble(), expectedType);
             else if (expectedType.FLOAT() is not null)
-                return new TypedFloat(stream.ReadFloat());
+                return new TypedFloat(stream.ReadFloat(), expectedType);
             else if (expectedType.STRING() is not null)
-                return new TypedString(stream.ReadString());
+                return new TypedString(stream.ReadString(), expectedType);
             else if (expectedType.enumType() is not null || expectedType.messageType() is not null)
             {
                 return BindMessageOrEnumDef(protoContext, expectedType) switch
                 {
-                    EnumDefContext enumDef => new TypedEnum(stream.ReadEnum(), enumDef),
+                    EnumDefContext enumDef => new TypedEnum(stream.ReadEnum(), expectedType, enumDef),
                     MessageDefContext innerMessageDef => ParseMessage(stream, protoContext, innerMessageDef),
                     _ => throw new NotImplementedException(),
                 };
