@@ -1,22 +1,45 @@
-﻿@inherits ComponentBase
+﻿@using MudBlazor.Utilities
+@inherits ComponentBase
 @typeparam T
 
 
 <ul style="flex-shrink:0">
-    <Virtualize Items="viewList" ItemSize="50" Context="viewListItem">
-        <li @key="@(viewListItem.Key)" style="height:50px; flex-shrink:0; margin-left:@(viewListItem.Level * 48)pt;">
-            @if (ChildrenSelector?.Invoke(viewListItem.Item)?.Count > 0)
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.ChevronRight" OnClick="() => OnClick(viewListItem)" />
-            }
-            @if (ItemTemplate == null)
-            {
-                @viewListItem.Item
-            }
-            else
-            {
-                @ItemTemplate(viewListItem.Item)
-            }
+    <Virtualize Items="viewList" ItemSize="40" Context="viewListItem">
+        <li @key="@(viewListItem.Key)" style="flex-shrink:0;margin-left:@(viewListItem.Level * 32)pt;height:30pt;" class="@(ListItemClassname())">
+            <div class="@(ContentClassname(false))">
+                @if (ChildrenSelector?.Invoke(viewListItem.Item)?.Count > 0)
+                {
+                    <div class="mud-treeview-item-arrow">
+                        <MudIconButton Icon="@Icons.Material.Filled.ChevronRight" OnClick="() => OnClick(viewListItem)" Class="@(ButtonClassName(viewListItem.IsExpanded))" />
+                    </div>
+                }
+                @if (ItemTemplate == null)
+                {
+                    @viewListItem.Item
+                }
+                else
+                {
+                    @ItemTemplate(viewListItem.Item)
+                }
+            </div>
         </li>
     </Virtualize>
 </ul>
+
+@code {
+    protected string ListItemClassname() =>
+        new CssBuilder("mud-treeview-item")
+            .Build();
+
+    protected string ContentClassname(bool isSelected) =>
+        new CssBuilder("mud-treeview-item-content")
+            .AddClass("cursor-pointer", false)
+            .AddClass($"mud-treeview-item-selected", isSelected)
+            .Build();
+
+    protected string ButtonClassName(bool isExpanded) =>
+        new CssBuilder()
+            .AddClass("mud-treeview-item-arrow-expand")
+            .AddClass("mud-transform", isExpanded)
+            .Build();
+}
