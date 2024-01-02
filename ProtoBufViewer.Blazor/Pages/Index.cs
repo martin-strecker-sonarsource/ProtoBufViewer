@@ -52,7 +52,7 @@ namespace ProtoBufViewer.Blazor.Pages
                 {
                     lastRender = Stopwatch.StartNew();
                     this.StateHasChanged();
-                    await Task.Delay(50);
+                    await Task.Delay(15);
                 }
             }, ParseResult, SelectedMessage.MessageDefContext);
             TypedMessages = new(result);

@@ -19,7 +19,7 @@
         }
     </MudItem>
     <MudItem xs="12" sm="4">
-        <MudFileUpload T="IBrowserFile" Accept="*.proto" FilesChanged="MessageFileChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
+        <MudFileUpload T="IBrowserFile" Accept="text/x-protobuf" FilesChanged="MessageFileChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
             <ButtonTemplate>
                 @if (ProtoFile == null)
                 {
