@@ -59,16 +59,22 @@ namespace ProtoBuf.Logic
 
     public class TypedMessageDecoder
     {
-        public IReadOnlyList<TypedMessage> Parse(CodedInputStream stream, ProtoContext protoContext, MessageDefContext initialMessage)
+        public async Task<IReadOnlyList<TypedMessage>> Parse(CodedInputStream stream, Func<double, Task> progress, ProtoContext protoContext, MessageDefContext initialMessage)
         {
             var result = new List<TypedMessage>();
+            var context = new BindingContext();
             while (!stream.IsAtEnd)
             {
-                var binder = new MessageBinder(protoContext, initialMessage);
-                stream.ReadRawMessage(binder);
-                if (binder.Result != null)
+                var message = await Task.Run(async () =>
                 {
-                    result.Add(binder.Result);
+                    await progress((double)(stream.Position * 100) / stream.SizeLimit);
+                    var binder = new MessageBinder(protoContext, initialMessage, context);
+                    stream.ReadRawMessage(binder);
+                    return binder.Result;
+                });
+                if (message != null)
+                {
+                    result.Add(message);
                 }
             }
             return result;

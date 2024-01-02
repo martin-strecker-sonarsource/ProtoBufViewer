@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf;
 using Microsoft.AspNetCore.Components.Forms;
 using ProtoBuf.Logic;
+using System.Diagnostics;
 using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBufViewer.Blazor.Pages
@@ -13,6 +14,7 @@ namespace ProtoBufViewer.Blazor.Pages
         HashSet<MessageViewModel> Messages { get; } = new();
         MessageViewModel? SelectedMessage { get; set; }
         ProtoContext? ParseResult { get; set; }
+        public double? Progress { get; set; }
 
         List<ProtoType>? TypedMessages { get; set; }
 
@@ -34,14 +36,27 @@ namespace ProtoBufViewer.Blazor.Pages
 
         private async Task BinFilesChanged(IBrowserFile file)
         {
+            if (ParseResult == null || SelectedMessage == null) return;
             ProtoBinFile = file;
-            using var ms = new MemoryStream();
-            await file.OpenReadStream().CopyToAsync(ms);
+            using var ms = new MemoryStream(capacity: (int)file.Size);
+            Progress = 0;
+            await file.OpenReadStream(maxAllowedSize: file.Size).CopyToAsync(ms);
             ms.Position = 0;
-            using var coded = CodedInputStream.CreateWithLimits(ms, int.MaxValue, int.MaxValue);
+            using var coded = CodedInputStream.CreateWithLimits(ms, (int)ms.Length, int.MaxValue);
             var decoder = new TypedMessageDecoder();
-            var result = decoder.Parse(coded, ParseResult, SelectedMessage.MessageDefContext);
+            var lastRender = Stopwatch.StartNew();
+            var result = await decoder.Parse(coded, async progress =>
+            {
+                Progress = progress;
+                if (lastRender.ElapsedMilliseconds > 1000)
+                {
+                    lastRender = Stopwatch.StartNew();
+                    this.StateHasChanged();
+                    await Task.Delay(50);
+                }
+            }, ParseResult, SelectedMessage.MessageDefContext);
             TypedMessages = new(result);
+            Progress = null;
         }
     }
 }

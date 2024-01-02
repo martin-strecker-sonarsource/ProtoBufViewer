@@ -137,7 +137,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    private void ParseBinary()
+    private async Task ParseBinary()
     {
         TypedMessages = null;
         try
@@ -149,7 +149,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 using var fs = new FileStream(file, FileMode.Open, FileAccess.Read);
                 using var coded = CodedInputStream.CreateWithLimits(fs, int.MaxValue, int.MaxValue);
                 var decoder = new TypedMessageDecoder();
-                TypedMessages = decoder.Parse(coded, protoContext, messageDefContext);
+                TypedMessages = await decoder.Parse(coded, async _ => { }, protoContext, messageDefContext);
             }
         }
         catch (Exception ex)

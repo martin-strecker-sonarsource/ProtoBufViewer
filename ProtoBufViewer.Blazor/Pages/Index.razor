@@ -3,10 +3,18 @@
 @using ProtoBuf.Logic
 @using static ProtoBuf.Antlr.Protobuf3Parser
 
+<PageTitle>Protobuf Viewer</PageTitle>
 
 <MudGrid>
-    <MudItem xs="12">
-        <PageTitle>Protobuf Viewer</PageTitle>
+    <MudItem xxl="12" xs="12">
+        @if (Progress.HasValue)
+        {
+            <MudProgressLinear Value="@Progress.Value" Color="Color.Primary" Class="mt-1"/>
+        }
+        else
+        {
+            <div class="mt-2" />
+        }
     </MudItem>
     <MudItem xs="12" sm="4">
         <MudFileUpload T="IBrowserFile" Accept="*.proto" FilesChanged="MessageFileChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
@@ -58,7 +66,7 @@
         }
         else
         {
-            <MudFileUpload T="IBrowserFile" FilesChanged="BinFilesChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
+            <MudFileUpload T="IBrowserFile" FilesChanged="BinFilesChanged" Hidden="@false" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0" >
                 <ButtonTemplate>
                     @if (ProtoBinFile == null)
                     {

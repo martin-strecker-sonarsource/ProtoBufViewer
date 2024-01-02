@@ -8,6 +8,12 @@ using static ProtoBuf.Antlr.Protobuf3Parser;
 
 namespace ProtoBuf.Logic
 {
+    internal class BindingContext
+    {
+        public ConcurrentDictionary<(Type_Context, string names), ParserRuleContext?> TypeBindingCache { get; } = new();
+        public ConcurrentDictionary<(MessageDefContext? messageDef, int fieldIndex), FieldContext?> FieldCache { get; } = new();
+    }
+
     internal class MessageBinder : IMessage
     {
         enum FieldType
@@ -17,16 +23,14 @@ namespace ProtoBuf.Logic
             Packed
         }
 
-        public MessageBinder(ProtoContext protoContext, MessageDefContext? messageDef) : this(protoContext, messageDef, null) { }
-
-        private MessageBinder(ProtoContext protoContext, MessageDefContext? messageDef, ConcurrentDictionary<(Type_Context, string names), ParserRuleContext?>? cache)
+        public MessageBinder(ProtoContext protoContext, MessageDefContext? messageDef, BindingContext bindingContext)
         {
             ProtoContext = protoContext;
             MessageDef = messageDef;
-            BindingCache = cache ?? new();
+            BindingContext = bindingContext ?? new();
         }
 
-        private ConcurrentDictionary<(Type_Context, string names), ParserRuleContext?> BindingCache { get; }
+        private BindingContext BindingContext { get; }
         public ProtoContext ProtoContext { get; }
         public MessageDefContext? MessageDef { get; }
         public TypedMessage? Result { get; private set; }
@@ -39,7 +43,8 @@ namespace ProtoBuf.Logic
             while (input.Position < targetPosition && !input.IsAtEnd)
             {
                 var (index, type) = input.ReadWireTag();
-                var field = MessageDef?.messageBody().messageElement().Select(x => x.field()).FirstOrDefault(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == index);
+                var field = BindingContext.FieldCache.GetOrAdd((MessageDef, index), 
+                    key => key.messageDef?.messageBody().messageElement().Select(x => x.field()).FirstOrDefault(x => int.TryParse(x?.fieldNumber()?.GetText(), out var i) && i == key.fieldIndex));
                 var parsedFields = MessageDef != null && field != null && FitsFieldType(type, field.type_()) is var fieldType and not FieldType.Unknown
                     ? ParseField(input, fieldType, field)
                     : ParseUnknownField(input, new WireTag(index, type));
@@ -184,7 +189,7 @@ namespace ProtoBuf.Logic
         {
             var namesString = string.Join(".", names);
             var key = (expectedType, namesString);
-            if (BindingCache.TryGetValue(key, out var cached))
+            if (BindingContext.TypeBindingCache.TryGetValue(key, out var cached))
             {
                 return cached;
             }
@@ -192,7 +197,7 @@ namespace ProtoBuf.Logic
             {
                 var result = BindType(names, expectedType, names => new MessageDefBinder(names)) as ParserRuleContext
                     ?? BindType(names, expectedType, names => new EnumDefBinder(names));
-                BindingCache.TryAdd(key, result);
+                BindingContext.TypeBindingCache.TryAdd(key, result);
                 return result;
             }
         }
@@ -211,7 +216,7 @@ namespace ProtoBuf.Logic
 
         private ProtoType? ParseMessage(CodedInputStream stream, MessageDefContext? messageDef)
         {
-            var builder = new MessageBinder(ProtoContext, messageDef, BindingCache);
+            var builder = new MessageBinder(ProtoContext, messageDef, BindingContext);
             stream.ReadRawMessage(builder);
             return builder.Result;
         }

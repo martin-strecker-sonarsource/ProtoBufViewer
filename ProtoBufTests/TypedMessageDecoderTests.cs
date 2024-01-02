@@ -265,8 +265,8 @@ namespace ProtoBufTests
             var decoder = new TypedMessageDecoder();
             var proto = ProtoParser.ParseFile("AnalyzerReport.proto");
             var tokenTypeInfo = proto.topLevelDef().Where(x => x.messageDef()?.messageName().GetText() == protoDefinition).First().messageDef();
-            var actual = decoder.Parse(stream, proto, tokenTypeInfo);
-            return actual;
+            var actual = decoder.Parse(stream, async _ => { }, proto, tokenTypeInfo);
+            return actual.Result;
         }
     }
 }

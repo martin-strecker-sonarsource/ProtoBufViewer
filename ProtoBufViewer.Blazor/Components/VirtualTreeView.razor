@@ -1,9 +1,9 @@
 ﻿@using MudBlazor.Utilities
 @typeparam T
 
-<ul>
+<ul class="@(TreeViewClassname())">
     <Virtualize Items="viewList" ItemSize="40" Context="viewListItem">
-        <li @key="@(viewListItem.Key)" style="flex-shrink:0;margin-left:@(viewListItem.Level * 32)pt;height:30pt;" class="@(ListItemClassname())">
+        <li @key="@(viewListItem.Key)" style="flex-shrink: 0; margin-left: @(viewListItem.Level * 32)pt; height: 30pt;" class="@(ListItemClassname())">
             <div class="@(ContentClassname(false))">
                 <MudTreeViewItemToggleButton Visible="ChildrenSelector?.Invoke(viewListItem.Item)?.Count > 0" Expanded="@viewListItem.IsExpanded" ExpandedChanged="newIsExpanded => OnClick(newIsExpanded, viewListItem)" />
                 @if (ItemTemplate == null)
@@ -28,5 +28,9 @@
         new CssBuilder("mud-treeview-item-content")
             .AddClass("cursor-pointer", false)
             .AddClass("mud-treeview-item-selected", isSelected)
+            .Build();
+
+    protected string TreeViewClassname() =>
+            new CssBuilder("mud-treeview")
             .Build();
 }
