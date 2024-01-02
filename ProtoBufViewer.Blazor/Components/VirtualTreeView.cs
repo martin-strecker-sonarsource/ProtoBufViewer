@@ -32,12 +32,11 @@ namespace ProtoBufViewer.Blazor.Components
             }
         }
 
-        private void OnClick(ViewItem item)
+        private void OnClick(bool newIsExpanded, ViewItem item)
         {
             var viewListIndex = viewList.FindIndex(x => EqualityComparer<ViewItem>.Default.Equals(x, item));
             if (viewListIndex >= 0)
             {
-                var newIsExpanded = !item.IsExpanded;
                 viewList[viewListIndex] = item with { IsExpanded = newIsExpanded };
                 var children = ChildrenSelector?.Invoke(item.Item) ?? [];
                 if (newIsExpanded)
