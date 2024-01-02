@@ -91,10 +91,11 @@
                 </ButtonTemplate>
             </MudFileUpload>
         }
-        <VirtualTreeView T="ProtoType" Items="TypedMessages" ChildrenSelector="x => x switch {
-            TypedMessage message => message.Fields,
-            TypedField { Value: TypedMessage message } => message.Fields,
-            _ => []
+        <VirtualTreeView T="ProtoType" Items="TypedMessages" ChildrenSelector="x => x switch
+            {
+                TypedMessage message => message.Fields,
+                TypedField { Value: TypedMessage message } => message.Fields,
+                _ => [],
             }">
             <ItemTemplate>
                 @switch (context)
