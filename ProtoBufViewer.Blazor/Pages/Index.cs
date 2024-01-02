@@ -11,11 +11,11 @@ namespace ProtoBufViewer.Blazor.Pages
         private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
         private IBrowserFile? ProtoFile;
         private IBrowserFile? ProtoBinFile;
+
         HashSet<MessageViewModel> Messages { get; } = new();
         MessageViewModel? SelectedMessage { get; set; }
         ProtoContext? ParseResult { get; set; }
         public double? Progress { get; set; }
-
         List<ProtoType>? TypedMessages { get; set; }
 
         private async Task MessageFileChanged(IBrowserFile file)
