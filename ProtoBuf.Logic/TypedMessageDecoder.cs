@@ -7,7 +7,7 @@ namespace ProtoBuf.Logic
 {
     public abstract record class ProtoType(string Type, ParserRuleContext? TypeDefinition)
     {
-        public string Definition => TypeDefinition?.GetFullText() ?? "No definition";
+        public virtual string Definition => TypeDefinition?.GetFullText() ?? "No definition";
     }
     public sealed record class TypedDouble(double Value, ParserRuleContext? TypeDefinition) : ProtoType("Double", TypeDefinition);
     public sealed record class TypedFloat(float Value, ParserRuleContext? TypeDefinition) : ProtoType("Float", TypeDefinition);
@@ -29,30 +29,14 @@ namespace ProtoBuf.Logic
     {
         public string MessageType => MessageDef == null ? "Unknown message type" : MessageDef.messageName().GetText();
 
-        public string Definition => GetFullText(MessageDef);
-
-        public static string GetFullText(MessageDefContext context)
-        {
-            if (context.Start == null || context.Stop == null || context.Start.StartIndex < 0 || context.Stop.StopIndex < 0)
-                return context.GetText(); // Fallback
-
-            return context.Start.InputStream.GetText(Interval.Of(context.Start.StartIndex, context.Stop.StopIndex));
-        }
+        public override string Definition => MessageDef.GetFullText() ?? "No definition";
     }
     public sealed record class TypedEnum(int Value, ParserRuleContext? TypeDefinition, EnumDefContext? EnumDef) : ProtoType("Enum", TypeDefinition)
     {
         public string EnumType => EnumDef == null ? "Unknown enum type" : EnumDef.enumName().GetText();
         public string EnumValue => EnumDef?.enumBody().enumElement().FirstOrDefault(
             x => int.Parse(x.enumField().intLit().INT_LIT().Symbol.Text) == Value)?.enumField().ident().GetText() ?? "Unknown";
-        public string Definition => GetFullText(EnumDef);
-
-        public static string GetFullText(EnumDefContext context)
-        {
-            if (context.Start == null || context.Stop == null || context.Start.StartIndex < 0 || context.Stop.StopIndex < 0)
-                return context.GetText(); // Fallback
-
-            return context.Start.InputStream.GetText(Interval.Of(context.Start.StartIndex, context.Stop.StopIndex));
-        }
+        public override string Definition => EnumDef.GetFullText() ?? "No definition";
     }
 
     public sealed record class TypedField(string Name, int Index, ParserRuleContext? TypeDefinition, ProtoType Value): ProtoType(Value.Type, TypeDefinition);
